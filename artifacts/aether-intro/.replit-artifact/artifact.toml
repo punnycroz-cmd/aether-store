@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/aether-intro/"
+title = "Aether Studio Intro Video"
+version = "1.0.0"
+id = "artifacts/aether-intro"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/aether-intro/" ]
+localPort = 3001
+
+[services.development]
+run = "pnpm --filter @workspace/aether-intro run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aether-intro", "run", "build" ]
+publicDir = "artifacts/aether-intro/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "3001"
+BASE_PATH = "/aether-intro/"

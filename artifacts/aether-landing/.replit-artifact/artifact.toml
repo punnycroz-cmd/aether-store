@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/aether-landing/"
+title = "Aether Studio Landing Page"
+version = "1.0.0"
+id = "artifacts/aether-landing"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/aether-landing/" ]
+localPort = 3000
+
+[services.development]
+run = "pnpm --filter @workspace/aether-landing run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aether-landing", "run", "build" ]
+publicDir = "artifacts/aether-landing/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "3000"
+BASE_PATH = "/aether-landing/"

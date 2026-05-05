@@ -1,0 +1,98 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "sans-serif",
+      "count": 53
+    },
+    {
+      "family": "HYWenHei 85W",
+      "count": 23
+    },
+    {
+      "family": "HYWenHei 85W Placeholder",
+      "count": 23
+    },
+    {
+      "family": "Samsung Sharp Sans Bold",
+      "count": 15
+    },
+    {
+      "family": "Samsung Sharp Sans Bold Placeholder",
+      "count": 15
+    }
+  ],
+  "colors": {
+    "primary": "#F6E3BA",
+    "secondary": "#6D542F",
+    "accent": "#0000EE",
+    "background": "#FFFFFF",
+    "textPrimary": "#0000EE",
+    "link": "#0000EE"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "sans-serif",
+      "heading": "sans-serif"
+    },
+    "fontStacks": {
+      "body": [
+        "sans-serif"
+      ],
+      "heading": [
+        "sans-serif"
+      ],
+      "paragraph": [
+        "HYWenHei 85W",
+        "HYWenHei 85W Placeholder",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "12px",
+      "h2": "42px",
+      "body": "14px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "0px"
+  },
+  "components": {},
+  "images": {
+    "logo": null,
+    "favicon": "File saved at: attached_assets/favicon.webp",
+    "ogImage": "File saved at: attached_assets/ogImage.png"
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "unknown"
+  },
+  "designSystem": {
+    "framework": "unknown",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0,
+    "colors": 0,
+    "overall": 0
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": false,
+      "llmSucceeded": false,
+      "finalSource": "none",
+      "rawLogoSelection": {
+        "selectedLogoIndex": -1,
+        "selectedLogoReasoning": "LLM failed",
+        "confidence": 0
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": false,
+      "llmSucceeded": false,
+      "error": "LLM call failed or returned fallback values"
+    }
+  }
+}

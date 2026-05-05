@@ -1,0 +1,86 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "-r6a2yU5NIf6U0iT-TpHS"
+uri = "file://artifacts/aether-intro/public/assets/emerald-mist.png"
+type = "image"
+title = "Emerald mist background"
+
+[[generated]]
+id = "xc2VKhCEdbU1CTDqsSx8M"
+uri = "file://artifacts/aether-intro/public/assets/grimoire.png"
+type = "image"
+title = "Grimoire book"
+
+[[generated]]
+id = "HDhdJN3alYlidcuMexmwM"
+uri = "file://artifacts/aether-intro/public/assets/parchment.png"
+type = "image"
+title = "Parchment texture"
+
+[[generated]]
+id = "DdqzMl8KqYkISJHVHq2Gu"
+uri = "file://artifacts/aether-landing/public/assets/hero-bg.png"
+type = "image"
+title = "Hero dark mystical atmosphere"
+
+[[generated]]
+id = "riGTvhkpkyALxUQWqky-e"
+uri = "file://artifacts/aether-landing/public/assets/gallery-landscape.png"
+type = "image"
+title = "Fantasy landscape art"
+
+[[generated]]
+id = "u6jln5KfWmke9sQ-f6ibl"
+uri = "file://artifacts/aether-landing/public/assets/gallery-portrait.png"
+type = "image"
+title = "Magical portrait art"
+
+[[generated]]
+id = "d5AA3NZZVU-6dkUODd5n8"
+uri = "file://artifacts/aether-landing/public/assets/gallery-architectural.png"
+type = "image"
+title = "Architectural magical structure"
+
+[[generated]]
+id = "djUA_qzPESSBBSLWpK8On"
+uri = "file://artifacts/aether-landing/public/assets/grimoire-book.png"
+type = "image"
+title = "Ornate grimoire spellbook"
+
+[[generated]]
+id = "gCMwqd9Hl0e3EgJNcDuHw"
+uri = "file://artifacts/aether-landing/public/assets/vault-gallery.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "rgXHdyZHOGMXHFB8bz2FS"
+uri = "file://artifacts/aether-landing/public/assets/mascot.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "m2CBwzemBCRJ1B3gjW5ik"
+uri = "file://artifacts/aether-landing/public/assets/char-mage.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "6cE3hrWtqXKCY8JMJWrac"
+uri = "file://artifacts/aether-landing/public/assets/char-star.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OdDKSFnECw-ivWimQbieH"
+uri = "file://artifacts/aether-landing/public/assets/char-lantern.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "xBliA_5VBSnL_QS1OCujW"
+uri = "file://artifacts/aether-landing/public/assets/char-dream.png"
+type = "image"
+title = "generated_image"

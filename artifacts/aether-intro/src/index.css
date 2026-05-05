@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --color-parchment: #F6E3BA;
+  --color-brown: #6D542F;
+  --color-emerald: #10b981;
+  --color-purple: #8b5cf6;
+  --color-night: #0f172a;
+  --color-day: #f1f7f4;
+  --color-text-dark: #10243a;
+  --color-text-light: #f8fafc;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Outfit', sans-serif;
+  
+  --shadow-glow: 0 10px 25px rgba(16, 185, 129, 0.4);
+}
+
+@theme inline {
+  --color-parchment: var(--color-parchment);
+  --color-brown: var(--color-brown);
+  --color-emerald: var(--color-emerald);
+  --color-purple: var(--color-purple);
+  --color-night: var(--color-night);
+  --color-day: var(--color-day);
+  --color-text-dark: var(--color-text-dark);
+  --color-text-light: var(--color-text-light);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-night);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}

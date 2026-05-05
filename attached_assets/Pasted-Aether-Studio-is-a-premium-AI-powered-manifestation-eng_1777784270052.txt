@@ -1,0 +1,46 @@
+Aether Studio is a premium, AI-powered manifestation engine designed with a "Grimoire" aesthetic. When fully operational, it serves as a complete ecosystem for creating, managing, and sharing AI-generated art.
+
+Here is a full summary of its features:
+
+### 1. The Forge (Generation Console)
+The heart of the app, where visions are brought to life through precise control:
+*   **The Incantation**: Advanced text-to-image prompting with support for both positive descriptions and "Wards" (negative prompts to exclude unwanted elements).
+*   **Dimensional Realms**: A toggle system to switch between the **Day Realm** (Standard/SFW) and the **Star Realm** (NSFW/Unfiltered).
+*   **Casting Engine**: A selection of specialized models, including *Aether Synthesis v4.2*, *Ghibli Cinematic*, and *Epic Concept Art*.
+*   **Advanced Casting Controls**:
+    *   **Batch Manifestation**: Generate 1, 2, or 4 images simultaneously.
+    *   **Quality Selector**: Choose between *Standard* speed and *High-Res* detail.
+    *   **Canvas Dimensions**: Five preset aspect ratios (1:1, 4:3, 16:9, 9:16, 21:9) with custom interactive radio buttons.
+    *   **Magic Seed**: Optional manual seed input for reproducing specific results.
+*   **The Oracle**: A "randomize" feature that suggests high-quality prompts to spark inspiration.
+
+### 2. The Vault (Private History)
+A personal, permanent archive of your journey:
+*   **Spirit Grid**: A high-density masonry layout showing all your past generations.
+*   **Batch Management**: Automatically groups images from the same "casting" for easy browsing.
+*   **Visibility Control**: Surgically hide individual manifestations or "Banish" (permanently delete) them into the void.
+*   **Archive Toggle**: A "Show Hidden" feature to reveal and manage your archived or private works.
+
+### 3. Discovery & Feed (Community)
+The social and inspirational layer of Aether Studio:
+*   **Global Discovery**: A curated stream of manifestations created by others to explore new styles.
+*   **Social Feed**: A place to "Broadcast" your favorite discoveries and share thoughts with the community.
+*   **Essence Cloning**: The ability to "Clone" any image's prompt directly from Discovery or Feed into your own Forge with one click.
+
+### 4. Immersive Lightbox (Spirit Reveal)
+A cinematic viewer for examining manifestations in detail:
+*   **HD Viewer**: An immersive, full-screen view with glassmorphism overlays.
+*   **Metadata Display**: View the exact "Incantation" (prompt) and technical dimensions of any image.
+*   **Batch Navigation**: Switch between sibling images in a single batch without leaving the viewer.
+*   **Quick Actions**: Instantly hide, banish, or clone the active manifestation.
+
+### 5. Ambient Environment & UX
+*   **Aether Particles**: A custom real-time particle background that reacts to the interface.
+*   **Responsive Handle**: A unified header that allows the Forge to minimize on mobile devices, keeping the focus on your gallery.
+*   **Health Monitor**: A "Backend Status" indicator that provides real-time feedback on server connectivity.
+*   **Google Authentication**: Secure, one-tap login that manages your avatar and personal Vault.
+
+### 6. The Matrix Cast (Pro Feature)
+*   **Parallel Generation**: A high-speed mode that casts your prompt across **all available models simultaneously**, allowing you to compare styles side-by-side in a dedicated "Matrix" grid.
+
+When everything is working together, the app provides a seamless flow from **Inspiration** (Oracle/Discovery) → **Creation** (Forge) → **Curation** (Vault/Lightbox) → **Sharing** (Feed). 🧙‍♂️✨
