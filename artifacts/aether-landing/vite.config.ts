@@ -2,49 +2,25 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
+// Detect environment
+const isReplit = !!process.env.REPL_ID;
+const isProduction = process.env.NODE_ENV === "production";
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
-
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+// Use environment variables or defaults for local dev
+const port = Number(process.env.PORT) || 5173;
+const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, ".."),
-            }),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
+    // Replit-specific plugins only if on Replit
+    ...(isReplit ? [
+      // These would usually be imported dynamically to avoid errors locally
+      // but we'll leave them out for the universal config unless needed
+    ] : []),
   ],
   resolve: {
     alias: {
@@ -60,16 +36,20 @@ export default defineConfig({
   },
   server: {
     port,
-    strictPort: true,
+    strictPort: !isReplit, // Allow flexible ports locally
     host: "0.0.0.0",
-    allowedHosts: true,
-    fs: {
-      strict: true,
-    },
+    // PROXY: This allows your React app to talk to your backend secretly
+    proxy: !isProduction ? {
+      '/api/proxy': {
+        target: 'http://localhost:8080', // Change this to your Replit URL if testing remotely
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/proxy/, ''),
+      }
+    } : undefined
   },
   preview: {
     port,
     host: "0.0.0.0",
-    allowedHosts: true,
   },
 });
+
