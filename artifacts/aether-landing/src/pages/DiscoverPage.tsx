@@ -18,21 +18,21 @@ const ACTIVE_REALM: Record<string, { title: string; desc: string; img: string; c
   all: {
     title: 'The Unified Aether',
     desc: 'The complete stream of all manifestations. A confluence of every soul’s imagination, unfiltered and infinite.',
-    img: '/assets/archetypes/day.png',
+    img: `${import.meta.env.BASE_URL}assets/archetypes/day.png`,
     color: '#8b5cf6',
     glow: 'rgba(139,92,246,0.4)'
   },
   day: {
     title: 'The Radiant Arcanist',
     desc: 'The realm of pure creation and heroic light. High-fantasy visions of magic, nature, and sacred chronicles. (SFW)',
-    img: '/assets/archetypes/day.png',
+    img: `${import.meta.env.BASE_URL}assets/archetypes/day.png`,
     color: '#10b981',
     glow: 'rgba(16,185,129,0.35)'
   },
   star: {
     title: 'The Midnight Weaver',
     desc: 'The alluring realm of shadows and celestial mysteries. For those who seek the deeper, provocative secrets of the night. (NSFW)',
-    img: '/assets/archetypes/star.png',
+    img: `${import.meta.env.BASE_URL}assets/archetypes/star.png`,
     color: '#f472b6',
     glow: 'rgba(244,114,182,0.35)'
   }
