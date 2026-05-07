@@ -7,6 +7,7 @@ import { CommentsModal } from './CommentsModal';
 import { RemixTreeModal } from './RemixTreeModal';
 import { SaveToBoardModal } from './SaveToBoardModal';
 import { getThumb, timeAgo, extractTags } from '../lib/utils';
+import { apiFetch } from '../lib/api';
 import type { GalleryItem } from '../lib/types';
 
 const QUICK_REACTIONS = ['✨', '🔥', '💎'];
