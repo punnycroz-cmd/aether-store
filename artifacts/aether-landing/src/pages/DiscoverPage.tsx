@@ -8,12 +8,32 @@ import { extractTags, getThumb } from '../lib/utils';
 import { useAuth } from '../hooks/useAuth';
 import { useLocalStore } from '../hooks/useLocalStore';
 
-const CHARS = [
-  { img: 'char-mage.png',    name: 'The Arcanist',    role: 'Conjures visions from raw thought',  accent: '#10b981', glow: 'rgba(16,185,129,0.35)',  lore: 'Master of the emerald arts, the Arcanist channels pure creative energy into form. Her grimoire holds a thousand spells yet uncast.' },
-  { img: 'char-star.png',    name: 'The Star-Weaver', role: 'Threads constellations into art',     accent: '#8b5cf6', glow: 'rgba(139,92,246,0.4)',   lore: 'Born of starlight and shadow, she maps the cosmos onto every canvas. Each creation is a new constellation in the Aether.' },
-  { img: 'char-lantern.png', name: 'The Keeper',      role: 'Preserves light across the Aether',  accent: '#f6c043', glow: 'rgba(246,192,67,0.35)',  lore: 'Guardian of the golden lantern, the Keeper ensures no vision fades. Her warmth illuminates paths through the darkest realms.' },
-  { img: 'char-dream.png',   name: 'The Dreamwright', role: 'Sculpts worlds from sleeping minds',  accent: '#67e8f9', glow: 'rgba(103,232,249,0.35)', lore: 'She walks between waking and dreaming, gathering fragments of imagination. Her crystal orb holds visions yet to be dreamed.' },
+const REALMS = [
+  { id: 'all',  label: 'Explore All', icon: '🌌' },
+  { id: 'day',  label: 'Radiant Day', icon: '☀️' },
+  { id: 'star', label: 'Midnight Star', icon: '✨' },
 ];
+
+const ACTIVE_REALM: Record<string, { title: string; desc: string; img: string; color: string }> = {
+  all: {
+    title: 'The Unified Aether',
+    desc: 'The complete stream of all manifestations. A confluence of every soul’s imagination, unfiltered and infinite.',
+    img: '/assets/archetypes/day.png',
+    color: '#8b5cf6'
+  },
+  day: {
+    title: 'The Radiant Arcanist',
+    desc: 'The realm of pure creation and heroic light. High-fantasy visions of magic, nature, and sacred chronicles. (SFW)',
+    img: '/assets/archetypes/day.png',
+    color: '#10b981'
+  },
+  star: {
+    title: 'The Midnight Weaver',
+    desc: 'The alluring realm of shadows and celestial mysteries. For those who seek the deeper, provocative secrets of the night. (NSFW)',
+    img: '/assets/archetypes/star.png',
+    color: '#f472b6'
+  }
+};
 
 interface GalleryItem {
   request_id: string;
@@ -27,6 +47,7 @@ interface GalleryItem {
   user_picture?: string;
   created_at?: string;
   image_id_seq?: number;
+  likes_count?: number;
 }
 
 interface GalleryResponse {
@@ -40,7 +61,6 @@ type DiscoverTab = 'explore' | 'trending' | 'following';
 export function DiscoverPage() {
   const { user } = useAuth();
   const { getFollowing, unfollowUser, getRatingsSortable } = useLocalStore();
-  const [activeChar, setActiveChar] = useState(0);
   const [tab, setTab] = useState<DiscoverTab>('explore');
   const [feed, setFeed] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,7 +72,7 @@ export function DiscoverPage() {
   const [, navigate] = useLocation();
   const loaderRef = useRef<HTMLDivElement>(null);
   
-  const char = CHARS[activeChar];
+  const char = ACTIVE_REALM[realmFilter] || ACTIVE_REALM.all;
   const following = getFollowing();
   const ratings = getRatingsSortable();
 
@@ -157,7 +177,7 @@ export function DiscoverPage() {
       <div className="pt-[72px]">
         {/* ── HERO SECTION ── */}
         <div className="max-w-7xl mx-auto px-8 py-10">
-          <motion.div className="text-center mb-8" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div className="text-center mb-12" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#fff', fontWeight: 700 }}>
               The <span style={{ color: '#8b5cf6' }}>Aether</span> Hub
             </h1>
@@ -166,35 +186,25 @@ export function DiscoverPage() {
             </p>
           </motion.div>
 
-          <div className="flex items-end justify-center gap-2 mb-10 overflow-x-auto pb-4 px-4 no-scrollbar">
-            {CHARS.map((c, i) => {
-              const active = activeChar === i;
+          <div className="relative flex flex-wrap justify-center gap-6 md:gap-10 mb-8 px-4">
+            {[REALMS[1], REALMS[2]].map((r) => {
+              const data = ACTIVE_REALM[r.id];
+              const isActive = realmFilter === r.id;
               return (
-                <motion.div key={c.name} onClick={() => setActiveChar(i)}
-                  className="relative flex-shrink-0 rounded-2xl overflow-hidden cursor-pointer"
-                  style={{
-                    width: active ? 'clamp(140px, 15vw, 200px)' : 'clamp(90px, 10vw, 130px)',
-                    aspectRatio: '3/4',
-                    border: `${active ? 2 : 1}px solid ${active ? c.accent : c.accent + '33'}`,
-                    boxShadow: active ? `0 0 32px ${c.glow}` : 'none',
-                    background: 'linear-gradient(160deg,rgba(10,15,30,0.95),rgba(5,8,18,0.98))',
-                  }}>
-                  <img src={`${import.meta.env.BASE_URL}assets/${c.img}`} alt={c.name}
-                    className="relative z-10 w-full h-full object-contain object-bottom" 
-                    style={{ padding: '6% 8% 0', opacity: active ? 1 : 0.4 }} />
-                  <div className="absolute bottom-3 left-0 right-0 z-30 text-center">
-                    <span style={{ fontFamily: 'Cinzel, serif', fontSize: active ? '0.65rem' : '0.5rem', color: active ? c.accent : 'rgba(255,255,255,0.3)', letterSpacing: '0.12em' }}>
-                      {c.name}
-                    </span>
-                  </div>
-                </motion.div>
+                <RealmCard
+                  key={r.id}
+                  active={isActive}
+                  onClick={() => setRealmFilter(r.id)}
+                  img={data.img}
+                  name={data.title}
+                  role={r.id === 'day' ? 'SFW • Radiant Light' : 'NSFW • Alluring Dark'}
+                  accent={data.color}
+                  glow={`${data.color}40`}
+                  lore={data.desc}
+                />
               );
             })}
           </div>
-
-          <motion.div key={activeChar} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-xl mx-auto text-center mb-4 px-4">
-            <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.85rem', color: 'rgba(248,250,252,0.45)', lineHeight: 1.6 }}>{char.lore}</p>
-          </motion.div>
         </div>
 
         {/* ── UNIFIED GALLERY SECTION ── */}
@@ -223,20 +233,6 @@ export function DiscoverPage() {
                   <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search visions..."
                     className="w-full pl-9 pr-4 py-2 rounded-xl outline-none"
                     style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.72rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff' }} />
-                </div>
-
-                <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  {(['all','day','star'] as const).map(r => (
-                    <button key={r} onClick={() => setRealmFilter(r)}
-                      className="px-3 py-1.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-tighter transition-all"
-                      style={{
-                        fontFamily: 'Outfit, sans-serif',
-                        background: realmFilter === r ? 'rgba(255,255,255,0.08)' : 'transparent',
-                        color: realmFilter === r ? '#fff' : 'rgba(255,255,255,0.3)',
-                      }}>
-                      {r === 'all' ? 'All' : r === 'day' ? 'Day' : 'Star'}
-                    </button>
-                  ))}
                 </div>
               </div>
             </div>
