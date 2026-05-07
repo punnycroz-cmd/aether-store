@@ -93,7 +93,7 @@ export function NotificationsPanel({ onClose }: Props) {
             </span>
           )}
         </div>
-        {notifications.length > 0 && (
+        {localNotifs.length > 0 && (
           <button onClick={clearNotifications}
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em' }}>
             Clear all
