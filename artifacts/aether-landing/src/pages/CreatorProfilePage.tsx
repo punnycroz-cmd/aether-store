@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { SiteNav } from '../components/SiteNav';
 import { useLocalStore } from '../hooks/useLocalStore';
-import { apiFetch } from '../lib/api';
 import { getThumb, timeAgo } from '../lib/utils';
+import { social } from '../lib/api';
 import type { GalleryItem, GalleryResponse } from '../lib/types';
 
 export function CreatorProfilePage({ params }: { params?: { username?: string } }) {
@@ -15,18 +15,29 @@ export function CreatorProfilePage({ params }: { params?: { username?: string } 
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const following = isFollowing(username);
+  const [profile, setProfile] = useState<any>(null);
 
   const loadFeed = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<GalleryResponse>('/public-gallery?limit=50');
+      const profRes = await social.getProfile(username);
+      setProfile(profRes.profile);
+      
+      const data = await social.getPublicGallery({ 
+        limit: 50, 
+        target_uid: profRes.profile.uid 
+      });
+      
       const items = (data.items ?? [])
-        .filter(it => (it.user_name ?? '') === username)
-        .filter(it => (it.images ?? []).some(img => img.status !== 'hidden' && img.status !== 'deleting'));
+        .filter((it: any) => (it.images ?? []).some((img: any) => img.status !== 'hidden' && img.status !== 'deleting'));
+      
       const seen = new Set<string>();
-      setFeed(items.filter(it => seen.has(it.request_id) ? false : (seen.add(it.request_id), true)));
-    } catch { /* noop */ }
-    finally { setLoading(false); }
+      setFeed(items.filter((it: any) => seen.has(it.request_id) ? false : (seen.add(it.request_id), true)));
+    } catch (err) {
+      console.error("Failed to load creator", err);
+    } finally {
+      setLoading(false);
+    }
   }, [username]);
 
   useEffect(() => { loadFeed(); }, [loadFeed]);
@@ -80,13 +91,24 @@ export function CreatorProfilePage({ params }: { params?: { username?: string } 
           {/* Info */}
           <div className="flex-1">
             <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: '1.5rem', color: '#f8fafc', letterSpacing: '0.1em', marginBottom: 6 }}>
-              {username || 'Unknown Creator'}
+              {profile?.name || username || 'Unknown Creator'}
             </h1>
-            <div className="flex flex-wrap gap-4 mb-4">
-              <div className="text-center">
-                <div style={{ fontFamily: 'Cinzel, serif', fontSize: '1.1rem', color: '#f8fafc' }}>{feed.length}</div>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.52rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Visions</div>
-              </div>
+            <div className="flex flex-wrap gap-4 mb-6">
+              {[
+                { label: 'Visions',   value: profile?.manifestation_count ?? feed.length },
+                { label: 'Followers', value: profile?.follower_count ?? 0 },
+                { label: 'Following', value: profile?.following_count ?? 0 },
+              ].map(s => (
+                <div key={s.label} className="text-center px-4 py-2 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: '1.1rem', color: '#f8fafc' }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.52rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+                    {s.label}
+                  </div>
+                </div>
+              ))}
             </div>
 
             <motion.button onClick={handleFollow}
@@ -98,7 +120,7 @@ export function CreatorProfilePage({ params }: { params?: { username?: string } 
                 color: following ? 'rgba(255,255,255,0.45)' : accent, cursor: 'pointer',
               }}
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              {following ? '✓ Following' : '+ Follow'}
+              {following ? '✓ Following' : '+ Follow Creator'}
             </motion.button>
           </div>
         </motion.div>

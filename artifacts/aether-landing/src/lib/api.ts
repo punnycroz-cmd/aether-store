@@ -54,3 +54,22 @@ export const STAR_MODELS = [
 
 export const ASPECT_CHOICES = ['1:1', '16:9', '5:2', '4:5', '4:7'];
 export const QUALITY_CHOICES = ['Fast', 'High Quality'];
+
+// Social API helpers
+export const social = {
+  like: (rid: string) => apiFetch<{ liked: boolean }>(`gallery/like/${rid}`, { method: 'POST' }),
+  comment: (rid: string, content: string) => apiFetch<{ status: string; comment: any }>(`gallery/comment/${rid}`, { method: 'POST', body: JSON.stringify({ content }) }),
+  getComments: (rid: string) => apiFetch<{ comments: any[] }>(`gallery/comments/${rid}`),
+  follow: (uid: string) => apiFetch<{ followed: boolean }>(`user/follow/${uid}`, { method: 'POST' }),
+  getProfile: (uid: string) => apiFetch<{ profile: any }>(`user/profile/${uid}`),
+  getPublicGallery: (params: { limit?: number; before?: string; realm?: string; search?: string; sort?: string; target_uid?: string }) => {
+    const q = new URLSearchParams();
+    if (params.limit) q.set('limit', String(params.limit));
+    if (params.before) q.set('before', params.before);
+    if (params.realm) q.set('realm', params.realm);
+    if (params.search) q.set('search', params.search);
+    if (params.sort) q.set('sort', params.sort);
+    if (params.target_uid) q.set('target_uid', params.target_uid);
+    return apiFetch<any>(`public-gallery?${q.toString()}`);
+  }
+};

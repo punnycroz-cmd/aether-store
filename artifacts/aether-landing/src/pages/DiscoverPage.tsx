@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { SiteNav } from '../components/SiteNav';
 import { PromptCard } from '../components/PromptCard';
-import { apiFetch } from '../lib/api';
+import { apiFetch, social } from '../lib/api';
 import { extractTags, getThumb } from '../lib/utils';
 import { useAuth } from '../hooks/useAuth';
 import { useLocalStore } from '../hooks/useLocalStore';
@@ -70,14 +70,17 @@ export function DiscoverPage() {
     if (loading) return;
     setLoading(true);
     try {
-      const params = new URLSearchParams({ limit: '24' });
-      const cur = reset ? null : cursor;
-      if (cur) params.set('before', String(cur));
+      const data = await social.getPublicGallery({
+        limit: 24,
+        before: reset ? undefined : (cursor ? String(cursor) : undefined),
+        realm: realmFilter === 'all' ? undefined : realmFilter,
+        search: searchQuery.trim() || undefined,
+        sort: tab === 'trending' ? 'trending' : 'newest'
+      });
       
-      const data = await apiFetch<GalleryResponse>(`/public-gallery?${params}`);
-      const items = (data.items ?? []).filter(item => {
+      const items = (data.items ?? []).filter((item: any) => {
         const imgs = item.images ?? [];
-        return imgs.some(img => img.status !== 'hidden' && img.status !== 'deleting');
+        return imgs.some((img: any) => img.status !== 'hidden' && img.status !== 'deleting');
       });
 
       setFeed(prev => {
@@ -92,14 +95,17 @@ export function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }, [cursor, loading]);
+  }, [cursor, loading, realmFilter, searchQuery, tab]);
 
   useEffect(() => {
-    setFeed([]);
-    setCursor(null);
-    setHasMore(true);
-    loadFeed(true);
-  }, [tab]);
+    const timer = setTimeout(() => {
+      setFeed([]);
+      setCursor(null);
+      setHasMore(true);
+      loadFeed(true);
+    }, searchQuery ? 500 : 0);
+    return () => clearTimeout(timer);
+  }, [tab, realmFilter, searchQuery]);
 
   useEffect(() => {
     const io = new IntersectionObserver(entries => {
@@ -114,20 +120,12 @@ export function DiscoverPage() {
     
     if (tab === 'following') {
       list = list.filter(it => following.includes(it.user_name ?? ''));
-    } else if (tab === 'trending') {
-      list = [...list].sort((a, b) => {
-        const rA = ratings[a.request_id]?.sum || 0;
-        const rB = ratings[b.request_id]?.sum || 0;
-        return rB - rA || (Math.random() - 0.5);
-      });
     }
 
     return list
       .filter(item => getThumb(item))
-      .filter(item => realmFilter === 'all' || item.realm === realmFilter)
-      .filter(item => !searchQuery.trim() || (item.prompt ?? '').toLowerCase().includes(searchQuery.toLowerCase()) || (item.user_name ?? '').toLowerCase().includes(searchQuery.toLowerCase()))
       .filter(item => !tagFilter || (item.prompt ?? '').toLowerCase().includes(tagFilter));
-  }, [feed, tab, following, realmFilter, searchQuery, tagFilter, ratings]);
+  }, [feed, tab, following, tagFilter]);
 
   return (
     <div className="min-h-screen" style={{ background: '#080c1a' }}>
@@ -249,7 +247,7 @@ export function DiscoverPage() {
                   <motion.div key={item.request_id} className="break-inside-avoid mb-5"
                     initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                     transition={{ delay: (i % 8) * 0.05 }}>
-                    <PromptCard item={item} baseLikes={item.image_id_seq ? (item.image_id_seq % 120) : 0} />
+                    <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
                   </motion.div>
                 ))}
               </div>

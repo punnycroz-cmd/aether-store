@@ -7,7 +7,7 @@ import { CommentsModal } from './CommentsModal';
 import { RemixTreeModal } from './RemixTreeModal';
 import { SaveToBoardModal } from './SaveToBoardModal';
 import { getThumb, timeAgo, extractTags } from '../lib/utils';
-import { apiFetch } from '../lib/api';
+import { apiFetch, social } from '../lib/api';
 import type { GalleryItem } from '../lib/types';
 
 const QUICK_REACTIONS = ['✨', '🔥', '💎'];
@@ -44,8 +44,8 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
 
   const thumb = getThumb(item);
   const accent = item.realm === 'star' ? '#8b5cf6' : '#10b981';
-  const liked = isLiked(item.request_id);
-  const likeCount = getLikes(item.request_id, baseLikes);
+  const liked = isLiked(item.request_id) || (item as any).is_liked;
+  const likeCount = Math.max(getLikes(item.request_id, baseLikes), (item as any).likes_count || 0);
   const savedItem = isSaved(item.request_id);
   const commentCount = getCommentCount(item.request_id);
   const reactionCounts = getReactions(item.request_id);
@@ -69,9 +69,17 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
     navigate('/forge');
   }
 
-  function handleLike(e: React.MouseEvent) {
+  async function handleLike(e: React.MouseEvent) {
     e.stopPropagation();
+    // Optimistic local update
     toggleLike(item.request_id);
+    
+    try {
+      await social.like(item.request_id);
+    } catch (err) {
+      // Revert on failure if needed, but for now we just let it be
+      console.error("Failed to sync like to server", err);
+    }
   }
 
   function handleSave(e: React.MouseEvent) {

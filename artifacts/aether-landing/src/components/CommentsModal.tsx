@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocalStore } from '../hooks/useLocalStore';
 import { useAuth } from '../hooks/useAuth';
 import { getThumb } from '../lib/utils';
+import { social } from '../lib/api';
 import type { GalleryItem } from '../lib/types';
 
 const REACTIONS = [
@@ -64,10 +65,12 @@ export function CommentsModal({ item, onClose }: CommentsModalProps) {
   const [text, setText] = useState('');
   const [authorName, setAuthorName] = useState(user?.name ?? '');
   const [submitted, setSubmitted] = useState(false);
+  const [backendComments, setBackendComments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const comments = getComments(item.request_id);
+  const localComments = getComments(item.request_id);
   const reactionCounts = getReactions(item.request_id);
   const myReaction = getMyReaction(item.request_id);
   const thumb = getThumb(item);
@@ -76,6 +79,18 @@ export function CommentsModal({ item, onClose }: CommentsModalProps) {
   const likeCount = getLikes(item.request_id, 0);
   const rating = getRating(item.request_id);
   const myRating = getMyRating(item.request_id);
+
+  // Sync with backend
+  useEffect(() => {
+    let mounted = true;
+    social.getComments(item.request_id).then(res => {
+      if (mounted) {
+        setBackendComments(res.comments);
+        setLoading(false);
+      }
+    }).catch(() => setLoading(false));
+    return () => { mounted = false; };
+  }, [item.request_id]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -88,16 +103,45 @@ export function CommentsModal({ item, onClose }: CommentsModalProps) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       setSubmitted(false);
     }
-  }, [submitted, comments.length]);
+  }, [submitted, backendComments.length, localComments.length]);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!text.trim()) return;
     const name = authorName.trim() || 'Anonymous Arcanist';
+    
+    // 1. Optimistic local update
     addComment(item.request_id, text, name, user?.picture ?? undefined);
     addNotification({ type: 'comment', message: `You commented on "${(item.prompt ?? 'a vision').slice(0, 40)}…"` });
+    
+    const commentText = text;
     setText('');
     setSubmitted(true);
+
+    // 2. Sync to backend
+    try {
+      await social.comment(item.request_id, commentText);
+      // Refresh backend list
+      const res = await social.getComments(item.request_id);
+      setBackendComments(res.comments);
+    } catch (err) {
+      console.error("Failed to post comment to server", err);
+    }
   }
+
+  // Merge comments for display (Backend priority, then local ones that might not be synced yet)
+  const allComments = [...backendComments];
+  localComments.forEach(lc => {
+    // Basic deduplication by content+author if we want, but usually backend refresh handles it
+    if (!backendComments.find(bc => bc.content === lc.text && bc.author_name === lc.authorName)) {
+      allComments.push({
+        id: lc.id,
+        content: lc.text,
+        author_name: lc.authorName,
+        author_picture: lc.authorPicture,
+        created_at: lc.createdAt
+      });
+    }
+  });
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit();
@@ -235,33 +279,33 @@ export function CommentsModal({ item, onClose }: CommentsModalProps) {
 
         {/* Comments list */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4" style={{ minHeight: 0 }}>
-          {comments.length === 0 ? (
+          {allComments.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-8">
               <span style={{ fontSize: '1.5rem', opacity: 0.4 }}>💬</span>
               <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.06em' }}>
-                No threads yet — start the conversation
+                {loading ? 'Consulting the Aether...' : 'No threads yet — start the conversation'}
               </p>
             </div>
           ) : (
-            comments.map((c, i) => (
+            allComments.map((c, i) => (
               <motion.div key={c.id}
                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
                 className="flex gap-3">
-                {c.authorPicture ? (
-                  <img src={c.authorPicture} alt="" className="w-7 h-7 rounded-xl object-cover flex-shrink-0" style={{ border: `1px solid ${accent}30` }} />
+                {c.author_picture ? (
+                  <img src={c.author_picture} alt="" className="w-7 h-7 rounded-xl object-cover flex-shrink-0" style={{ border: `1px solid ${accent}30` }} />
                 ) : (
                   <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${accent}15`, border: `1px solid ${accent}25` }}>
-                    <span style={{ fontFamily: 'Cinzel, serif', fontSize: '0.55rem', color: accent }}>{c.authorName[0]?.toUpperCase()}</span>
+                    <span style={{ fontFamily: 'Cinzel, serif', fontSize: '0.55rem', color: accent }}>{(c.author_name || 'A')[0].toUpperCase()}</span>
                   </div>
                 )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', color: accent, fontWeight: 600 }}>{c.authorName}</span>
-                    <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(255,255,255,0.2)' }}>{timeAgo(c.createdAt)}</span>
+                    <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', color: accent, fontWeight: 600 }}>{c.author_name}</span>
+                    <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(255,255,255,0.2)' }}>{timeAgo(c.created_at)}</span>
                   </div>
                   <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: 'rgba(248,250,252,0.65)', lineHeight: 1.55 }}>
-                    {c.text}
+                    {c.content}
                   </p>
                 </div>
               </motion.div>
