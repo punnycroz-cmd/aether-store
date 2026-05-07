@@ -35,6 +35,8 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
   const [showSaveBoard, setShowSaveBoard] = useState(false);
   const [copyFlash, setCopyFlash] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
+  const [shareLinkLoading, setShareLinkLoading] = useState(false);
+  const [shareLinkFlash, setShareLinkFlash] = useState(false);
   const [followFlash, setFollowFlash] = useState<'followed' | 'unfollowed' | null>(null);
   const [authorHover, setAuthorHover] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -110,6 +112,34 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
       navigator.clipboard.writeText(item.prompt ?? '').catch(() => {});
     } finally {
       setShareLoading(false);
+    }
+  }
+
+  async function handleCreateDirectLink(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (shareLinkLoading) return;
+    setShareLinkLoading(true);
+    try {
+      // 1. Call backend to create short link
+      // image_index is 0 because manifestations usually represent the first image
+      // or the batch itself in this UI.
+      const res = await apiFetch<{ share_url: string }>('api/share', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          request_id: item.request_id, 
+          image_index: 0 
+        })
+      });
+
+      // 2. Copy to clipboard
+      await navigator.clipboard.writeText(res.share_url);
+      setShareLinkFlash(true);
+      addNotification({ type: 'milestone', message: 'Direct link copied to clipboard!' });
+      setTimeout(() => setShareLinkFlash(false), 2000);
+    } catch (err: any) {
+      addNotification({ type: 'milestone', message: 'Failed to create link: ' + err.message });
+    } finally {
+      setShareLinkLoading(false);
     }
   }
 
@@ -227,6 +257,23 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
                 {shareLoading
                   ? <motion.div className="w-2.5 h-2.5 rounded-full border" style={{ borderColor: '#a78bfa transparent transparent transparent' }} animate={{ rotate: 360 }} transition={{ duration: 0.7, repeat: Infinity, ease: 'linear' }} />
                   : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                }
+              </motion.button>
+              <motion.button onClick={handleCreateDirectLink}
+                className="px-2.5 py-1.5 rounded-lg backdrop-blur-sm"
+                style={{ 
+                  background: shareLinkFlash ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.1)', 
+                  border: `1px solid ${shareLinkFlash ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.15)'}`, 
+                  color: shareLinkFlash ? '#10b981' : 'rgba(255,255,255,0.6)', 
+                  transition: 'all 0.2s' 
+                }}
+                whileHover={{ background: 'rgba(255,255,255,0.18)' }} whileTap={{ scale: 0.95 }}
+                title="Copy Direct Link">
+                {shareLinkLoading
+                  ? <motion.div className="w-2.5 h-2.5 rounded-full border" style={{ borderColor: '#a78bfa transparent transparent transparent' }} animate={{ rotate: 360 }} transition={{ duration: 0.7, repeat: Infinity, ease: 'linear' }} />
+                  : shareLinkFlash 
+                    ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+                    : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 }
               </motion.button>
             </div>
