@@ -103,26 +103,26 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
 
         {/* Streak badge */}
         {streak.count > 0 && (
-          <div className="hidden md:flex items-center gap-1 px-2 py-1.5 rounded-xl"
+          <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl"
             style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)' }}
             title={`${streak.count}-day forge streak`}>
             <span style={{ fontSize: '0.75rem' }}>🔥</span>
-            <span style={{ fontFamily: 'Cinzel, serif', fontSize: '0.68rem', color: '#f97316' }}>{streak.count}</span>
+            <span className="hidden md:inline" style={{ fontFamily: 'Cinzel, serif', fontSize: '0.68rem', color: '#f97316' }}>{streak.count}</span>
           </div>
         )}
 
         {/* Vault link */}
         <Link href="/vault">
-          <motion.div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl cursor-pointer"
+          <motion.div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl cursor-pointer"
             style={{ background: location === '/vault' ? 'rgba(246,224,186,0.1)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
             whileHover={{ background: 'rgba(246,224,186,0.1)' }}>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(246,224,186,0.55)" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(246,224,186,0.55)' }}>Vault</span>
+            <span className="hidden md:inline" style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(246,224,186,0.55)' }}>Vault</span>
           </motion.div>
         </Link>
 
         {/* Notifications bell */}
-        <div className="relative hidden md:block" ref={bellRef}>
+        <div className="relative" ref={bellRef}>
           <motion.button
             onClick={() => setShowNotifs(o => !o)}
             className="relative w-8 h-8 rounded-xl flex items-center justify-center"

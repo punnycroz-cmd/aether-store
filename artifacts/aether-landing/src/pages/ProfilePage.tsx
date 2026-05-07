@@ -357,10 +357,10 @@ export function ProfilePage() {
                       <span style={{ fontSize: '1.5rem' }}>{board.icon}</span>
                       <motion.button
                         onClick={() => deleteBoard(board.id)}
-                        className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg flex items-center justify-center"
-                        style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(239,68,68,0.6)', transition: 'opacity 0.2s', cursor: 'pointer' }}
+                        className="md:opacity-0 md:group-hover:opacity-100 w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(239,68,68,0.8)', transition: 'opacity 0.2s', cursor: 'pointer' }}
                         whileHover={{ background: 'rgba(239,68,68,0.25)' }} whileTap={{ scale: 0.9 }}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
                       </motion.button>
                     </div>
                     <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.82rem', color: 'rgba(248,250,252,0.7)', marginBottom: 4 }}>{board.name}</div>

@@ -431,8 +431,8 @@ export function ForgePage() {
                     initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                     onClick={() => setLightboxIdx(i)}>
                     <img src={url} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                       <a href={url} download className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-[0.6rem] uppercase tracking-widest text-white backdrop-blur-md">Save Vision</a>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-end p-4">
+                       <a href={url} download className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-[0.62rem] font-bold uppercase tracking-widest text-white backdrop-blur-md">Save Vision</a>
                     </div>
                   </motion.div>
                 ))}
