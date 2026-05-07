@@ -23,6 +23,7 @@ export async function apiFetch<T = unknown>(
       ...extraHeaders,
       ...(opts.headers ?? {}),
     },
+    signal: opts.signal,
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -62,7 +63,7 @@ export const social = {
   getComments: (rid: string) => apiFetch<{ comments: any[] }>(`gallery/comments/${rid}`),
   follow: (uid: string) => apiFetch<{ followed: boolean }>(`user/follow/${uid}`, { method: 'POST' }),
   getProfile: (uid: string) => apiFetch<{ profile: any }>(`user/profile/${uid}`),
-  getPublicGallery: (params: { limit?: number; before?: string; realm?: string; search?: string; sort?: string; target_uid?: string }) => {
+  getPublicGallery: (params: { limit?: number; before?: string; realm?: string; search?: string; sort?: string; target_uid?: string; signal?: AbortSignal }) => {
     const q = new URLSearchParams();
     if (params.limit) q.set('limit', String(params.limit));
     if (params.before) q.set('before', params.before);
@@ -70,6 +71,6 @@ export const social = {
     if (params.search) q.set('search', params.search);
     if (params.sort) q.set('sort', params.sort);
     if (params.target_uid) q.set('target_uid', params.target_uid);
-    return apiFetch<any>(`public-gallery?${q.toString()}`);
+    return apiFetch<any>(`public-gallery?${q.toString()}`, { signal: params.signal });
   }
 };

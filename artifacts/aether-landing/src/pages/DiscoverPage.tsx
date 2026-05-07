@@ -66,8 +66,18 @@ export function DiscoverPage() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([tag, count]) => ({ tag, count }));
   }, [feed]);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const loadFeed = useCallback(async (reset = false) => {
-    if (loading) return;
+    if (loading && !reset) return;
+    
+    // Abort previous request if resetting
+    if (reset && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
       const data = await social.getPublicGallery({
@@ -75,9 +85,12 @@ export function DiscoverPage() {
         before: reset ? undefined : (cursor ? String(cursor) : undefined),
         realm: realmFilter === 'all' ? undefined : realmFilter,
         search: searchQuery.trim() || undefined,
-        sort: tab === 'trending' ? 'trending' : 'newest'
+        sort: tab === 'trending' ? 'trending' : 'newest',
+        signal: controller.signal
       });
       
+      if (controller.signal.aborted) return;
+
       const items = (data.items ?? []).filter((item: any) => {
         const imgs = item.images ?? [];
         return imgs.some((img: any) => img.status !== 'hidden' && img.status !== 'deleting');
@@ -90,10 +103,14 @@ export function DiscoverPage() {
       });
       setHasMore(data.has_more ?? false);
       setCursor(data.next_cursor ?? null);
-    } catch (e) {
-      console.error('Gallery load failed:', e);
+    } catch (e: any) {
+      if (e.name !== 'AbortError') {
+        console.error('Gallery load failed:', e);
+      }
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
   }, [cursor, loading, realmFilter, searchQuery, tab]);
 
