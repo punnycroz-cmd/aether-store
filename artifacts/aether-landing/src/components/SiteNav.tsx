@@ -17,7 +17,8 @@ const TABS = [
 export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
   const [location, navigate] = useLocation();
   const { user, signOut } = useAuth();
-  const { credits, unreadCount, streak, recordStreak } = useLocalStore();
+  const { credits, unreadCount: localUnread, streak, recordStreak } = useLocalStore();
+  const [backendUnread, setBackendUnread] = useState(0);
   const [dropOpen, setDropOpen]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
@@ -28,6 +29,23 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
   const dark       = !isLanding || (activeSection !== 2 && activeSection !== 4);
   const textBase   = dark ? 'rgba(248,250,252,0.45)' : 'rgba(16,36,58,0.5)';
   const brandColor = dark ? '#F6E3BA' : '#6D542F';
+
+  useEffect(() => {
+    // Check backend notifications periodically
+    const sync = () => {
+      import('../lib/api').then(({ social }) => {
+        social.getNotifications().then(res => {
+          const unread = res.notifications.filter((n: any) => !n.is_read).length;
+          setBackendUnread(unread);
+        }).catch(() => {});
+      });
+    };
+    sync();
+    const timer = setInterval(sync, 30000); // Sync every 30s
+    return () => clearInterval(timer);
+  }, [showNotifs]); // Re-sync when panel closes
+
+  const totalUnread = localUnread + backendUnread;
 
   useEffect(() => {
     function handle(e: MouseEvent) {
@@ -132,12 +150,12 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={showNotifs ? '#a78bfa' : 'rgba(255,255,255,0.4)'} strokeWidth="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            {unreadCount > 0 && (
+            {totalUnread > 0 && (
               <motion.div
                 className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full flex items-center justify-center px-1"
                 style={{ background: '#8b5cf6', fontFamily: 'Outfit, sans-serif', fontSize: '0.5rem', color: '#fff' }}
                 initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                {unreadCount > 9 ? '9+' : unreadCount}
+                {totalUnread > 9 ? '9+' : totalUnread}
               </motion.div>
             )}
           </motion.button>
