@@ -231,7 +231,6 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
               ))}
             </div>
 
-            {/* Bottom action bar */}
             <div className="absolute bottom-2 left-2 right-2 flex gap-1.5">
               <motion.button onClick={remix}
                 className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg backdrop-blur-sm"
