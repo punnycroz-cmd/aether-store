@@ -92,7 +92,12 @@ function RealmCard({ active, onClick, img, name, role, accent, glow, lore }: Rea
         }} />
       
       <img src={img} alt={name} className="relative z-10 w-full h-full object-contain object-bottom pt-8 transition-all duration-500"
-        style={{ opacity: active ? 1 : 0.4, transform: active ? 'scale(1.05)' : 'scale(1)' }} />
+        style={{ 
+          opacity: active ? 1 : 0.4, 
+          transform: active ? 'scale(1.12)' : 'scale(1.05)',
+          maskImage: 'linear-gradient(to top, transparent 5%, black 35%)',
+          WebkitMaskImage: 'linear-gradient(to top, transparent 5%, black 35%)'
+        }} />
 
       <div className="absolute bottom-0 left-0 right-0 z-20 p-6 pt-12"
         style={{ background: 'linear-gradient(to top, rgba(8,12,24,0.95), transparent)' }}>
