@@ -8,7 +8,6 @@ import { NotificationsPanel } from './NotificationsPanel';
 const mascotImg = `${import.meta.env.BASE_URL}assets/mascot.png`;
 
 const TABS = [
-  { label: 'Feed',       path: '/feed',       accent: '#10b981' },
   { label: 'Discover',   path: '/discover',   accent: '#8b5cf6' },
   { label: 'Store',      path: '/store',      accent: '#f6c043' },
   { label: 'Challenges', path: '/challenges', accent: '#f472b6' },
