@@ -61,6 +61,60 @@ interface GalleryResponse {
 
 type DiscoverTab = 'explore' | 'trending' | 'following';
 
+interface RealmCardProps {
+  active: boolean;
+  onClick: () => void;
+  img: string;
+  name: string;
+  role: string;
+  accent: string;
+  glow: string;
+  lore: string;
+}
+
+function RealmCard({ active, onClick, img, name, role, accent, glow, lore }: RealmCardProps) {
+  return (
+    <motion.div
+      onClick={onClick}
+      className="group relative flex-shrink-0 w-64 h-80 rounded-3xl overflow-hidden cursor-pointer"
+      style={{
+        background: 'rgba(10,15,30,0.4)',
+        border: `1px solid ${active ? accent : 'rgba(255,255,255,0.08)'}`,
+        boxShadow: active ? `0 0 40px ${glow}` : 'none',
+      }}
+      whileHover={{ scale: 1.02, y: -4 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div className="absolute inset-0 z-0 transition-opacity duration-500"
+        style={{
+          background: `radial-gradient(circle at 50% 100%, ${accent}25, transparent 70%)`,
+          opacity: active ? 1 : 0
+        }} />
+      
+      <img src={img} alt={name} className="relative z-10 w-full h-full object-contain object-bottom pt-8 transition-all duration-500"
+        style={{ opacity: active ? 1 : 0.4, transform: active ? 'scale(1.05)' : 'scale(1)' }} />
+
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-6 pt-12"
+        style={{ background: 'linear-gradient(to top, rgba(8,12,24,0.95), transparent)' }}>
+        <div className="text-[0.6rem] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: active ? accent : 'rgba(255,255,255,0.3)' }}>{role}</div>
+        <div className="text-sm font-bold uppercase tracking-widest mb-2" style={{ fontFamily: 'Cinzel, serif', color: '#fff' }}>{name}</div>
+        <AnimatePresence>
+          {active && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}
+            >
+              {lore}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
 export function DiscoverPage() {
   const { user } = useAuth();
   const { getFollowing, unfollowUser, getRatingsSortable } = useLocalStore();
