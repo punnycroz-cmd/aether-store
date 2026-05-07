@@ -86,6 +86,7 @@ export function DiscoverPage() {
         realm: realmFilter === 'all' ? undefined : realmFilter,
         search: searchQuery.trim() || undefined,
         sort: tab === 'trending' ? 'trending' : 'newest',
+        following_only: tab === 'following',
         signal: controller.signal
       });
       
@@ -135,14 +136,14 @@ export function DiscoverPage() {
   const filteredFeed = useMemo(() => {
     let list = feed;
     
-    if (tab === 'following') {
-      list = list.filter(it => following.includes(it.user_name ?? ''));
-    }
+    // Backend now handles 'following' filter if tab === 'following'
+    // but we can still keep frontend filter as a secondary check if needed
+    // though it's better to trust the backend.
 
     return list
       .filter(item => getThumb(item))
       .filter(item => !tagFilter || (item.prompt ?? '').toLowerCase().includes(tagFilter));
-  }, [feed, tab, following, tagFilter]);
+  }, [feed, tagFilter]);
 
   return (
     <div className="min-h-screen" style={{ background: '#080c1a' }}>
