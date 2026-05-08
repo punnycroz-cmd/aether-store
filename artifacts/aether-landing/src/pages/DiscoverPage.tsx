@@ -95,6 +95,7 @@ function RealmCard({ active, onClick, img, name, role, accent, glow, lore }: Rea
         style={{ 
           opacity: active ? 1 : 0.4, 
           transform: active ? 'scale(1.12)' : 'scale(1.05)',
+          mixBlendMode: 'screen',
           maskImage: 'linear-gradient(to top, transparent 5%, black 35%)',
           WebkitMaskImage: 'linear-gradient(to top, transparent 5%, black 35%)'
         }} />
