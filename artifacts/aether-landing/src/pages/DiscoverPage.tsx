@@ -81,6 +81,7 @@ function RealmCard({ active, onClick, img, name, role, accent, glow, lore }: Rea
         background: 'rgba(10,15,30,0.4)',
         border: `1px solid ${active ? accent : 'rgba(255,255,255,0.08)'}`,
         boxShadow: active ? `0 0 40px ${glow}` : 'none',
+        isolation: 'isolate'
       }}
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
