@@ -371,7 +371,7 @@ export function ForgePage() {
           <div className="px-5 py-5 space-y-3 bg-black/40" style={{ borderTop: `1px solid ${border}` }}>
             {isGenerating && (
               <motion.button onClick={cancelJob}
-                className="w-full flex items-center justify-center gap-2.5 rounded-xl font-bold uppercase tracking-widest text-[0.62rem] h-[44px]"
+                className="w-full flex items-center justify-center gap-2.5 rounded-lg font-bold uppercase tracking-widest text-[0.62rem] h-[44px]"
                 style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(248,113,113,0.7)', cursor: 'pointer' }}>
                 Cancel manifestation
               </motion.button>
@@ -424,7 +424,7 @@ export function ForgePage() {
             )}
 
             {genStatus === 'done' && images.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
                 {images.map((url, i) => (
                   <motion.div key={url} className="relative rounded-2xl overflow-hidden border border-white/10 group"
                     style={{ aspectRatio: aspect.split(':').join('/') }}
@@ -438,7 +438,7 @@ export function ForgePage() {
                 ))}
               </div>
             ) : genStatus === 'idle' || isGenerating ? (
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
                 {[0, 1, 2, 3].map((i) => (
                   <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] flex items-center justify-center"
                     style={{ aspectRatio: aspect.split(':').join('/') }}>

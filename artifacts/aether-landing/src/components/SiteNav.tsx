@@ -83,17 +83,15 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
           style={{ background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)' }}>
           {TABS.map(tab => {
             const active = location === tab.path;
-            const isCage = tab.label.includes('Cage');
+            const isSecondary = tab.label === 'Store' || tab.label === 'Challenges' || tab.label.includes('Cage');
             return (
-              <Link key={tab.path} href={tab.path}>
+              <Link key={tab.path} href={tab.path} className={isSecondary ? 'hidden lg:block' : 'block'}>
                 <motion.div className="relative px-3 md:px-5 py-2 rounded-lg cursor-pointer group"
                   style={{ background: active ? `${tab.accent}12` : 'transparent' }}
                   whileHover={{ background: `${tab.accent}08` }}>
                   <div className="flex items-center gap-2">
-                    {/* Tablet/Mobile Icon Only Logic could go here, but sm+ we keep labels */}
                     <span className="text-[0.62rem] md:text-[0.68rem] font-bold uppercase tracking-widest transition-colors duration-300"
                       style={{ fontFamily: 'Outfit, sans-serif', color: active ? tab.accent : textBase }}>
-                      {/* Condensed labels for tablet */}
                       <span className="md:inline hidden">{tab.label}</span>
                       <span className="md:hidden inline">{tab.label.split(' ')[0].replace('🔒', '')}</span>
                     </span>
@@ -107,6 +105,16 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
               </Link>
             );
           })}
+          
+          {/* Tablet 'More' Menu for secondary tabs */}
+          <div className="lg:hidden block relative">
+             <motion.button onClick={() => setDropOpen(!dropOpen)}
+               className="px-3 py-2 rounded-lg text-[0.62rem] font-bold uppercase tracking-widest"
+               style={{ fontFamily: 'Outfit, sans-serif', color: textBase, background: 'transparent' }}
+               whileHover={{ background: 'rgba(255,255,255,0.05)' }}>
+               More
+             </motion.button>
+          </div>
           
           <Link href="/forge">
             <motion.div className="px-4 md:px-6 py-2 rounded-lg cursor-pointer ml-1"
@@ -209,7 +217,8 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
 
                     <div className="p-1.5">
                       {[
-                        { label: 'My Profile', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', path: '/profile' },
+                        { label: 'Store', icon: 'M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z', path: '/store' },
+                        { label: 'Challenges', icon: 'M12 15l-2 5h4l-2-5zm0 0l2-5h-4l2 5zm0 0l5 2-5-2zm0 0l-5 2 5-2z', path: '/challenges' },
                         { label: 'My Vault', icon: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z', path: '/vault' },
                         { label: 'The Forge', icon: 'M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83', path: '/forge' },
                       ].map(item => (

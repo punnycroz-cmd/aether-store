@@ -128,7 +128,7 @@ export function VaultPage() {
       }} />
 
       <div className="pt-[72px]">
-        <div className="max-w-6xl mx-auto px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
 
           {/* Header */}
           <motion.div className="text-center mb-10"
@@ -206,7 +206,7 @@ export function VaultPage() {
               </motion.div>
 
               {/* Masonry */}
-              <div className="columns-2 lg:columns-3 gap-5">
+              <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
                 <AnimatePresence>
                   {visible.map((entry, i) => {
                     const col = entry.realm === 'day' ? dayAccent : starAccent;
@@ -375,13 +375,13 @@ function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, o
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose}>
-      <motion.div className="relative w-full max-w-5xl flex flex-col md:flex-row gap-4"
+      <motion.div className="relative w-full max-w-5xl flex flex-col lg:flex-row gap-4"
         initial={{ scale: 0.9, y: 32 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.88, opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{ maxHeight: '90vh' }}>
 
-        <div className="flex-1 relative rounded-2xl overflow-hidden" style={{ minHeight: 300, maxHeight: '85vh' }}>
+        <div className="flex-1 relative rounded-lg overflow-hidden" style={{ minHeight: 300, maxHeight: '85vh' }}>
           <img src={currentUrl} className="w-full h-full object-cover" alt="" />
           {(['top-3 left-3 border-t-2 border-l-2','top-3 right-3 border-t-2 border-r-2','bottom-3 left-3 border-b-2 border-l-2','bottom-3 right-3 border-b-2 border-r-2'] as const).map((cls, ci) => (
             <div key={ci} className={`absolute w-6 h-6 pointer-events-none ${cls}`} style={{ borderColor: accent }} />
@@ -410,7 +410,7 @@ function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, o
           )}
         </div>
 
-        <div className="md:w-64 flex-shrink-0 flex flex-col gap-3" style={{ maxHeight: '85vh' }}>
+        <div className="lg:w-64 flex-shrink-0 flex flex-col gap-3" style={{ maxHeight: '85vh' }}>
           <div className="flex justify-end">
             <button className="w-9 h-9 rounded-full flex items-center justify-center"
               style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
@@ -419,7 +419,7 @@ function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, o
             </button>
           </div>
 
-          <div className="flex-1 rounded-2xl p-5 overflow-y-auto"
+          <div className="flex-1 rounded-lg p-5 overflow-y-auto"
             style={{ background: 'rgba(8,12,24,0.96)', border: `1px solid ${accent}28` }}>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full mb-4"
               style={{ background: `${accent}18`, border: `1px solid ${accent}40` }}>
