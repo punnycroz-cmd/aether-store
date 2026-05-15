@@ -209,7 +209,7 @@ export function ForgePage() {
             <motion.div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: accent }}
               animate={{ boxShadow: [`0 0 5px ${accent}`, `0 0 16px ${accent}`, `0 0 5px ${accent}`] }}
               transition={{ duration: 2, repeat: Infinity }} />
-            <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: '0.9rem', color: '#f8fafc', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
+            <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: '0.85rem', color: '#f8fafc', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
               The Forge
             </h1>
             {user && (
@@ -227,7 +227,7 @@ export function ForgePage() {
             {/* Auth prompt */}
             {!authLoading && !user && (
               <div className="flex flex-col items-center gap-3 py-2">
-                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 2 }}>
+                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.6rem', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 2 }}>
                   Sign in to conjure
                 </p>
                 <GoogleSignInButton theme="filled_black" size="large" text="signin_with" width={240} />
@@ -259,8 +259,8 @@ export function ForgePage() {
             )}
 
             {/* Realm */}
-            <Field label="Dimensional Realm">
-              <div className="flex p-1 rounded-xl" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Field label="Realm">
+              <div className="flex p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 {(['day', 'star'] as const).map((r) => {
                   const col = r === 'day' ? '#10b981' : '#8b5cf6';
                   const on  = realm === r;
@@ -278,9 +278,9 @@ export function ForgePage() {
             {/* Incantation */}
             <div>
               <label style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.22em', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                <span className="flex items-center gap-1.5" style={{ color: 'rgba(246,196,67,0.65)' }}>
+                <span className="flex items-center gap-1.5" style={{ color: 'rgba(246,196,67,0.85)' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: accent, boxShadow: `0 0 6px ${accent}`, display: 'inline-block' }} />
-                  The Incantation
+                  Prompt
                 </span>
                 <motion.button onClick={consultOracle}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg"
@@ -290,11 +290,11 @@ export function ForgePage() {
                 </motion.button>
               </label>
               <motion.textarea rows={4} value={prompt} onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe the masterpiece you wish to manifest…"
-                className="w-full resize-none rounded-xl p-4 text-sm outline-none"
+                placeholder="Describe your masterpiece…"
+                className="w-full resize-none rounded-lg p-4 text-sm outline-none"
                 animate={oraclePulse ? { boxShadow: [`0 0 0 2px ${accent}55`, '0 0 0 0px transparent'] } : {}}
                 transition={{ duration: 0.5 }}
-                style={{ fontFamily: 'Outfit, sans-serif', background: 'rgba(255,255,255,0.04)', border: `1px solid ${prompt ? accent + '55' : 'rgba(255,255,255,0.07)'}`, color: '#f8fafc', lineHeight: 1.65, transition: 'border-color 0.3s' }} />
+                style={{ fontFamily: 'Outfit, sans-serif', background: 'rgba(255,255,255,0.04)', border: `1px solid ${prompt ? accent + '55' : 'rgba(255,255,255,0.12)'}`, color: '#f8fafc', lineHeight: 1.65, transition: 'border-color 0.3s' }} />
 
               {/* Prompt history chips */}
               {promptHistory.length > 0 && (
@@ -320,30 +320,30 @@ export function ForgePage() {
             </div>
 
             {/* Wards */}
-            <Field label="Wards (Exclusions)" labelColor="rgba(248,113,113,0.5)" dotColor="#ef4444" dot>
+            <Field label="Negative Prompt" labelColor="rgba(248,113,113,0.7)" dotColor="#ef4444" dot>
               <textarea rows={2} value={negPrompt} onChange={(e) => setNegPrompt(e.target.value)}
                 placeholder="Elements to banish…"
-                className="w-full resize-none rounded-xl p-3 outline-none text-[0.8rem]"
-                style={{ fontFamily: 'Outfit, sans-serif', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.48)', lineHeight: 1.5 }} />
+                className="w-full resize-none rounded-lg p-3 outline-none text-[0.8rem]"
+                style={{ fontFamily: 'Outfit, sans-serif', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(248,250,252,0.65)', lineHeight: 1.5 }} />
             </Field>
 
             {/* Engine */}
-            <Field label="Casting Engine">
+            <Field label="Model">
               <GlassSelect value={model} onChange={setModel}>
                 {models.map((m) => <option key={m} value={m} style={{ background: '#070e1a' }}>{m}</option>)}
               </GlassSelect>
             </Field>
 
             {/* Aspect */}
-            <Field label="Canvas Dimensions">
+            <Field label="Dimensions">
               <div className="flex gap-2 flex-wrap">
                 {ASPECT_CHOICES.map((ar) => {
                   const [w, h] = ar.split(':').map(Number);
                   const scale = 50 / Math.max(w, h);
                   return (
                     <button key={ar} onClick={() => setAspect(ar)}
-                      className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-xl transition-all duration-200"
-                      style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', background: aspect === ar ? `${accent}1c` : 'rgba(255,255,255,0.04)', border: `1px solid ${aspect === ar ? accent + '55' : 'rgba(255,255,255,0.07)'}`, color: aspect === ar ? accent : 'rgba(255,255,255,0.36)' }}>
+                      className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all duration-200"
+                      style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', background: aspect === ar ? `${accent}1c` : 'rgba(255,255,255,0.04)', border: `1px solid ${aspect === ar ? accent + '55' : 'rgba(255,255,255,0.1)'}`, color: aspect === ar ? accent : 'rgba(255,255,255,0.5)' }}>
                       <div style={{ width: w * scale * 0.25, height: h * scale * 0.25, border: '1.5px solid currentColor', borderRadius: 2 }} />
                       {ar}
                     </button>
@@ -359,10 +359,10 @@ export function ForgePage() {
                   {QUALITY_CHOICES.map((q) => <option key={q} value={q} style={{ background: '#070e1a' }}>{q}</option>)}
                 </GlassSelect>
               </Field>
-              <Field label="Magic Seed">
+              <Field label="Seed">
                 <input type="number" value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="Auto"
-                  className="w-full rounded-xl px-3 h-10 outline-none text-[0.8rem]"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.48)' }} />
+                  className="w-full rounded-lg px-3 h-10 outline-none text-[0.8rem]"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(248,250,252,0.6)' }} />
               </Field>
             </div>
           </div>
@@ -376,12 +376,12 @@ export function ForgePage() {
                 Cancel manifestion
               </motion.button>
             )}
-            <motion.button onClick={manifest} disabled={isGenerating || !prompt.trim() || !user || user.isGuest}
-              className="w-full flex items-center justify-center gap-3 rounded-xl font-bold uppercase tracking-widest text-[0.72rem] h-[58px] text-white"
+            <motion.button onClick={manifest} disabled={isGenerating || !prompt.trim()}
+              className="w-full flex items-center justify-center gap-3 rounded-lg font-bold uppercase tracking-widest text-[0.72rem] h-[58px] text-white"
               style={{
-                background: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg,${accent},${accent}bb)`,
-                boxShadow: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'none' : `0 0 36px ${accentGlow}`,
-                cursor: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'not-allowed' : 'pointer',
+                background: (isGenerating || !prompt.trim()) ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg,${accent},${accent}bb)`,
+                boxShadow: (isGenerating || !prompt.trim()) ? 'none' : `0 0 36px ${accentGlow}`,
+                cursor: (isGenerating || !prompt.trim()) ? 'not-allowed' : 'pointer',
               }}
               whileTap={(!isGenerating && !!prompt.trim() && !!user && !user.isGuest) ? { scale: 0.96 } : {}}>
               {isGenerating ? (
@@ -389,8 +389,6 @@ export function ForgePage() {
                   <motion.div className="w-4 h-4 border-2 rounded-full" style={{ borderColor: `${accent} transparent transparent transparent` }} animate={{ rotate: 360 }} transition={{ duration: 0.75, repeat: Infinity, ease: 'linear' }} />
                   Summoning...
                 </>
-              ) : user?.isGuest ? (
-                'Sign In to Conjure'
               ) : (
                 'Manifest Vision'
               )}
@@ -472,7 +470,7 @@ export function ForgePage() {
 function Field({ label, labelColor, dot, dotColor, children }: any) {
   return (
     <div className="flex flex-col">
-      <label className="text-[0.62rem] uppercase tracking-[0.2em] mb-2.5 flex items-center gap-2" style={{ color: labelColor ?? 'rgba(246,196,67,0.6)' }}>
+      <label className="text-[0.62rem] uppercase tracking-[0.2em] mb-2.5 flex items-center gap-2" style={{ color: labelColor ?? 'rgba(246,196,67,0.85)' }}>
         {dot && <div className="w-1.5 h-1.5 rounded-full" style={{ background: dotColor ?? '#f6c043' }} />}
         {label}
       </label>
@@ -484,8 +482,8 @@ function Field({ label, labelColor, dot, dotColor, children }: any) {
 function GlassSelect({ value, onChange, children }: any) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-xl px-4 h-11 outline-none text-[0.8rem] transition-all cursor-pointer"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(248,250,252,0.7)' }}>
+      className="w-full rounded-lg px-4 h-11 outline-none text-[0.8rem] transition-all cursor-pointer"
+      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(248,250,252,0.8)' }}>
       {children}
     </select>
   );

@@ -27,7 +27,7 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
 
   const isLanding  = location === '/';
   const dark       = !isLanding || (activeSection !== 2 && activeSection !== 4);
-  const textBase   = dark ? 'rgba(248,250,252,0.45)' : 'rgba(16,36,58,0.5)';
+  const textBase   = dark ? 'rgba(248,250,252,0.75)' : 'rgba(16,36,58,0.85)';
   const brandColor = dark ? '#F6E3BA' : '#6D542F';
 
   useEffect(() => {
@@ -79,14 +79,14 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
         </Link>
 
         {/* --- DESKTOP/TABLET TABS --- */}
-        <div className="hidden sm:flex items-center gap-1 p-1 rounded-2xl"
-          style={{ background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: dark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)' }}>
+        <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg"
+          style={{ background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)' }}>
           {TABS.map(tab => {
             const active = location === tab.path;
             const isCage = tab.label.includes('Cage');
             return (
               <Link key={tab.path} href={tab.path}>
-                <motion.div className="relative px-3 md:px-5 py-2 rounded-xl cursor-pointer group"
+                <motion.div className="relative px-3 md:px-5 py-2 rounded-lg cursor-pointer group"
                   style={{ background: active ? `${tab.accent}12` : 'transparent' }}
                   whileHover={{ background: `${tab.accent}08` }}>
                   <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
           })}
           
           <Link href="/forge">
-            <motion.div className="px-4 md:px-6 py-2 rounded-xl cursor-pointer ml-1"
+            <motion.div className="px-4 md:px-6 py-2 rounded-lg cursor-pointer ml-1"
               style={{ 
                 background: location === '/forge' ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.05)',
                 border: `1px solid ${location === '/forge' ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.15)'}`
@@ -131,33 +131,33 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
           {/* Status Indicators (Hidden on super small) */}
           <div className="hidden lg:flex items-center gap-2 pr-2 border-r border-white/5 mr-1">
              {streak.count > 0 && (
-                <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-orange-500/5 border border-orange-500/10">
+                <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-orange-500/5 border border-orange-500/10">
                   <span className="text-[0.65rem]">🔥</span>
                   <span style={{ fontFamily: 'Cinzel, serif', fontSize: '0.65rem', color: '#f97316' }}>{streak.count}</span>
                 </div>
              )}
-             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-yellow-500/5 border border-yellow-500/10">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="#f6c043"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/></svg>
                 <span style={{ fontFamily: 'Cinzel, serif', fontSize: '0.68rem', color: '#f6c043' }}>{credits}</span>
              </div>
           </div>
 
           <Link href="/vault">
-            <motion.button className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl"
-              style={{ background: location === '/vault' ? 'rgba(246,224,186,0.08)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+            <motion.button className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg"
+              style={{ background: location === '/vault' ? 'rgba(246,224,186,0.08)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)' }}
               whileHover={{ background: 'rgba(246,224,186,0.1)' }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(246,224,186,0.4)" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(246,224,186,0.4)' }}>Vault</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(246,224,186,0.7)" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(246,224,186,0.75)' }}>Vault</span>
             </motion.button>
           </Link>
 
           {/* Notifications */}
           <div className="relative" ref={bellRef}>
             <motion.button onClick={() => setShowNotifs(!showNotifs)}
-              className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-all"
-              style={{ background: showNotifs ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showNotifs ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.06)'}` }}
+              className="w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center transition-all"
+              style={{ background: showNotifs ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showNotifs ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.1)'}` }}
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={showNotifs ? '#a78bfa' : 'rgba(255,255,255,0.35)'} strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={showNotifs ? '#a78bfa' : 'rgba(255,255,255,0.55)'} strokeWidth="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
               {totalUnread > 0 && (
@@ -175,7 +175,7 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
           {user && !user.isGuest ? (
             <div className="relative" ref={dropRef}>
               <motion.button onClick={() => setDropOpen(!dropOpen)}
-                className="flex items-center gap-2 p-1 md:p-1.5 rounded-xl border border-white/5 bg-white/5"
+                className="flex items-center gap-2 p-1 md:p-1.5 rounded-lg border border-white/10 bg-white/5"
                 whileHover={{ background: 'rgba(255,255,255,0.08)' }}>
                 {user.picture ? (
                   <img src={user.picture} alt="" className="w-6 h-6 md:w-7 md:h-7 rounded-lg object-cover" />

@@ -137,7 +137,7 @@ export function VaultPage() {
             <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 'clamp(2rem, 4vw, 3.2rem)', color: '#6D542F', fontWeight: 700 }}>
               Your Grimoire
             </h1>
-            <p className="mt-3 uppercase tracking-widest" style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.72rem', color: 'rgba(246,196,67,0.45)' }}>
+            <p className="mt-3 uppercase tracking-widest" style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.72rem', color: 'rgba(246,196,67,0.85)' }}>
               {visible.length} visions preserved · {hiddenCount} archived
             </p>
             <div className="flex items-center justify-center gap-4 mt-5">
@@ -186,8 +186,8 @@ export function VaultPage() {
                     const col = f.value === 'star' ? starAccent : f.value === 'day' ? dayAccent : '#F6E3BA';
                     return (
                       <button key={f.value} onClick={() => setFilter(f.value)}
-                        className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300"
-                        style={{ fontFamily: 'Outfit, sans-serif', background: on ? `${col}1c` : 'transparent', color: on ? col : 'rgba(255,255,255,0.3)', border: on ? `1px solid ${col}44` : '1px solid transparent' }}>
+                        className="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300"
+                        style={{ fontFamily: 'Outfit, sans-serif', background: on ? `${col}1c` : 'transparent', color: on ? col : 'rgba(255,255,255,0.6)', border: on ? `1px solid ${col}44` : '1px solid transparent' }}>
                         {f.label}
                       </button>
                     );
@@ -195,8 +195,8 @@ export function VaultPage() {
                 </div>
                 {hiddenCount > 0 && (
                   <button onClick={() => setShowHidden(s => !s)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300"
-                    style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', color: showHidden ? '#F6E3BA' : 'rgba(255,255,255,0.3)', background: showHidden ? 'rgba(246,227,186,0.08)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showHidden ? 'rgba(246,227,186,0.3)' : 'rgba(255,255,255,0.08)'}`, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-300"
+                    style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', color: showHidden ? '#F6E3BA' : 'rgba(255,255,255,0.6)', background: showHidden ? 'rgba(246,227,186,0.08)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showHidden ? 'rgba(246,227,186,0.3)' : 'rgba(255,255,255,0.12)'}`, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       {showHidden ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></> : <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>}
                     </svg>
@@ -210,7 +210,7 @@ export function VaultPage() {
                 <AnimatePresence>
                   {visible.map((entry, i) => {
                     const col = entry.realm === 'day' ? dayAccent : starAccent;
-                    const visImgs = entry.images.filter(img => img.status !== 'hidden' && img.status !== 'deleting');
+                    const visImgs = entry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
                     const thumb = proxyImg(visImgs[0]?.r2_url ?? visImgs[0]?.url ?? null);
                     if (!thumb) return null;
                     return (
@@ -285,7 +285,7 @@ export function VaultPage() {
                           <p style={{ fontFamily: 'Cinzel, serif', fontSize: '0.75rem', color: '#F6E3BA', fontWeight: 600, letterSpacing: '0.08em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {entry.model || 'Unknown Engine'}
                           </p>
-                          <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', color: 'rgba(248,250,252,0.38)', marginTop: 2, letterSpacing: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.58rem', color: 'rgba(248,250,252,0.75)', marginTop: 2, letterSpacing: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {formatDate(entry.created_at)} · {visImgs.length} vision{visImgs.length !== 1 ? 's' : ''}
                           </p>
                         </div>
@@ -313,8 +313,8 @@ export function VaultPage() {
               {hasMore && !loading && entries.length > 0 && (
                 <div className="flex justify-center mt-8">
                   <motion.button onClick={() => loadMore()}
-                    className="px-8 py-3 rounded-2xl font-bold uppercase tracking-widest"
-                    style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', background: 'rgba(246,196,67,0.06)', border: '1px solid rgba(246,196,67,0.2)', color: 'rgba(246,196,67,0.5)', cursor: 'pointer' }}
+                    className="px-8 py-3 rounded-lg font-bold uppercase tracking-widest"
+                    style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.65rem', background: 'rgba(246,196,67,0.06)', border: '1px solid rgba(246,196,67,0.25)', color: 'rgba(246,196,67,0.75)', cursor: 'pointer' }}
                     whileHover={{ background: 'rgba(246,196,67,0.1)' }}>
                     Summon More Visions
                   </motion.button>
@@ -331,6 +331,7 @@ export function VaultPage() {
           <VaultLightbox
             entry={lightboxEntry.entry}
             imgIdx={lightboxEntry.imgIdx}
+            showHidden={showHidden}
             onClose={() => setLightboxEntry(null)}
             onHide={() => hideBatch(lightboxEntry.entry.request_id)}
             onDelete={() => deleteBatch(lightboxEntry.entry.request_id)}
@@ -343,9 +344,10 @@ export function VaultPage() {
   );
 }
 
-function VaultLightbox({ entry, imgIdx, onClose, onHide, onDelete, onTogglePublic, onImgChange }: {
+function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, onTogglePublic, onImgChange }: {
   entry: VaultEntry;
   imgIdx: number;
+  showHidden: boolean;
   onClose: () => void;
   onHide: () => void;
   onDelete: () => void;
@@ -353,7 +355,7 @@ function VaultLightbox({ entry, imgIdx, onClose, onHide, onDelete, onTogglePubli
   onImgChange: (i: number) => void;
 }) {
   const accent = entry.realm === 'day' ? '#10b981' : '#8b5cf6';
-  const visImgs = entry.images.filter(img => img.status !== 'hidden' && img.status !== 'deleting');
+  const visImgs = entry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
   const currentUrl = proxyImg(visImgs[imgIdx]?.r2_url ?? visImgs[imgIdx]?.url ?? null);
 
   useEffect(() => {
