@@ -219,6 +219,7 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
                       {[
                         { label: 'Store', icon: 'M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z', path: '/store' },
                         { label: 'Challenges', icon: 'M12 15l-2 5h4l-2-5zm0 0l2-5h-4l2 5zm0 0l5 2-5-2zm0 0l-5 2 5-2z', path: '/challenges' },
+                        { label: 'The Cage', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', path: '/cage' },
                         { label: 'My Vault', icon: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z', path: '/vault' },
                         { label: 'The Forge', icon: 'M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83', path: '/forge' },
                       ].map(item => (
