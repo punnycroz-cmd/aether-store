@@ -49,6 +49,7 @@ export function VaultPage() {
   const [loading, setLoading]     = useState(false);
   const [hasMore, setHasMore]     = useState(true);
   const [cursor, setCursor]       = useState<number | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
   const [lightboxEntry, setLightboxEntry] = useState<{ entry: VaultEntry; imgIdx: number } | null>(null);
 
   const dayAccent  = '#10b981';
@@ -105,11 +106,28 @@ export function VaultPage() {
   }
 
   async function togglePublic(entry: VaultEntry) {
-    await apiFetch(`/history/batch/${entry.request_id}/public`, {
-      method: 'POST',
-      body: JSON.stringify({ is_public: !entry.is_public }),
-    }).catch(() => {});
-    setEntries(prev => prev.map(e => e.request_id === entry.request_id ? { ...e, is_public: !e.is_public } : e));
+    if (isSharing) return;
+    setIsSharing(true);
+    try {
+      await apiFetch(`/history/batch/${entry.request_id}/public`, {
+        method: 'POST',
+        body: JSON.stringify({ is_public: !entry.is_public }),
+      });
+      
+      const nextIsPublic = !entry.is_public;
+      
+      // Update gallery list
+      setEntries(prev => prev.map(e => e.request_id === entry.request_id ? { ...e, is_public: nextIsPublic } : e));
+      
+      // Sync lightbox state
+      if (lightboxEntry?.entry.request_id === entry.request_id) {
+        setLightboxEntry(prev => prev ? { ...prev, entry: { ...prev.entry, is_public: nextIsPublic } } : null);
+      }
+    } catch (e) {
+      console.error('Failed to toggle public:', e);
+    } finally {
+      setIsSharing(false);
+    }
   }
 
   const visible = entries.filter(e => showHidden || !e.is_hidden);
@@ -336,6 +354,7 @@ export function VaultPage() {
             onHide={() => hideBatch(lightboxEntry.entry.request_id)}
             onDelete={() => deleteBatch(lightboxEntry.entry.request_id)}
             onTogglePublic={() => togglePublic(lightboxEntry.entry)}
+            isSharing={isSharing}
             onImgChange={(idx) => setLightboxEntry(prev => prev ? { ...prev, imgIdx: idx } : null)}
           />
         )}
@@ -344,10 +363,11 @@ export function VaultPage() {
   );
 }
 
-function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, onTogglePublic, onImgChange }: {
+function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, onDelete, onTogglePublic, onImgChange }: {
   entry: VaultEntry;
   imgIdx: number;
   showHidden: boolean;
+  isSharing: boolean;
   onClose: () => void;
   onHide: () => void;
   onDelete: () => void;
@@ -455,12 +475,28 @@ function VaultLightbox({ entry, imgIdx, showHidden, onClose, onHide, onDelete, o
           </div>
 
           <div className="space-y-2 flex-shrink-0">
-            <motion.button onClick={onTogglePublic}
-              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold uppercase tracking-widest"
-              style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', background: entry.is_public ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${entry.is_public ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.1)'}`, color: entry.is_public ? '#c4b5fd' : 'rgba(255,255,255,0.4)', cursor: 'pointer' }}
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              {entry.is_public ? 'Unshare from Discovery' : 'Share to Discovery'}
+            <motion.button onClick={onTogglePublic} disabled={isSharing}
+              className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold uppercase tracking-widest"
+              style={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                fontSize: '0.62rem', 
+                background: isSharing ? 'rgba(255,255,255,0.02)' : (entry.is_public ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.04)'), 
+                border: `1px solid ${isSharing ? 'rgba(255,255,255,0.1)' : (entry.is_public ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.1)')}`, 
+                color: isSharing ? 'rgba(255,255,255,0.2)' : (entry.is_public ? '#10b981' : 'rgba(255,255,255,0.6)'), 
+                cursor: isSharing ? 'not-allowed' : 'pointer' 
+              }}
+              whileHover={!isSharing ? { scale: 1.02 } : {}} whileTap={!isSharing ? { scale: 0.97 } : {}}>
+              {isSharing ? (
+                <>
+                  <motion.div className="w-3 h-3 border-2 rounded-full" style={{ borderColor: 'rgba(255,255,255,0.4) transparent transparent transparent' }} animate={{ rotate: 360 }} transition={{ duration: 0.75, repeat: Infinity, ease: 'linear' }} />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  {entry.is_public ? 'Unshare from Discovery' : 'Share to Discovery'}
+                </>
+              )}
             </motion.button>
             <a href={currentUrl} download target="_blank" rel="noreferrer"
               className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold uppercase tracking-widest"
