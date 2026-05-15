@@ -373,7 +373,7 @@ export function ForgePage() {
               <motion.button onClick={cancelJob}
                 className="w-full flex items-center justify-center gap-2.5 rounded-xl font-bold uppercase tracking-widest text-[0.62rem] h-[44px]"
                 style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(248,113,113,0.7)', cursor: 'pointer' }}>
-                Cancel manifestion
+                Cancel manifestation
               </motion.button>
             )}
             <motion.button onClick={manifest} disabled={isGenerating || !prompt.trim() || !user || user.isGuest}
