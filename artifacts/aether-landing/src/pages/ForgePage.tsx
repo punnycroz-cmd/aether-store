@@ -191,11 +191,11 @@ export function ForgePage() {
         transition: 'background 0.8s',
       }} />
 
-      <div className="flex-1 flex flex-col lg:flex-row items-start pt-[76px]" style={{ minHeight: '100svh' }}>
+      <div className="flex-1 flex flex-col lg:flex-row items-start pt-[88px]" style={{ minHeight: '100svh' }}>
 
         {/* ── SIDEBAR / CONTROL PANEL ── */}
         <div
-          className="w-full lg:w-[clamp(320px,28vw,420px)] lg:h-[calc(100svh-76px)] lg:sticky lg:top-[76px] flex flex-col z-10"
+          className="w-full lg:w-[clamp(320px,28vw,420px)] lg:h-[calc(100svh-88px)] lg:sticky lg:top-[88px] flex flex-col z-10"
           style={{
             background: 'rgba(7,13,26,0.96)',
             backdropFilter: 'blur(24px)',
