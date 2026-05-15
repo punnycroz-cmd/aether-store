@@ -376,12 +376,12 @@ export function ForgePage() {
                 Cancel manifestion
               </motion.button>
             )}
-            <motion.button onClick={manifest} disabled={isGenerating || !prompt.trim()}
+            <motion.button onClick={manifest} disabled={isGenerating || !prompt.trim() || !user || user.isGuest}
               className="w-full flex items-center justify-center gap-3 rounded-lg font-bold uppercase tracking-widest text-[0.72rem] h-[58px] text-white"
               style={{
-                background: (isGenerating || !prompt.trim()) ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg,${accent},${accent}bb)`,
-                boxShadow: (isGenerating || !prompt.trim()) ? 'none' : `0 0 36px ${accentGlow}`,
-                cursor: (isGenerating || !prompt.trim()) ? 'not-allowed' : 'pointer',
+                background: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg,${accent},${accent}bb)`,
+                boxShadow: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'none' : `0 0 36px ${accentGlow}`,
+                cursor: (isGenerating || !prompt.trim() || !user || user.isGuest) ? 'not-allowed' : 'pointer',
               }}
               whileTap={(!isGenerating && !!prompt.trim() && !!user && !user.isGuest) ? { scale: 0.96 } : {}}>
               {isGenerating ? (
@@ -389,6 +389,8 @@ export function ForgePage() {
                   <motion.div className="w-4 h-4 border-2 rounded-full" style={{ borderColor: `${accent} transparent transparent transparent` }} animate={{ rotate: 360 }} transition={{ duration: 0.75, repeat: Infinity, ease: 'linear' }} />
                   Summoning...
                 </>
+              ) : user?.isGuest ? (
+                'Sign In to Manifest'
               ) : (
                 'Manifest Vision'
               )}
