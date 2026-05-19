@@ -395,15 +395,15 @@ function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, 
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose}>
-      <motion.div className="relative w-full max-w-5xl flex flex-col lg:flex-row gap-4"
+      <motion.div className="relative w-full max-w-5xl flex flex-col lg:flex-row lg:items-start gap-4 h-[90vh] lg:h-auto"
         initial={{ scale: 0.9, y: 32 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.88, opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{ maxHeight: '90vh' }}>
 
-        <div className="flex-1 relative rounded-lg flex items-center justify-center" style={{ minHeight: 300, maxHeight: '85vh' }}>
-          <div className="relative inline-flex items-center justify-center max-w-full" style={{ maxHeight: '85vh' }}>
-            <img src={currentUrl} className="max-w-full object-contain rounded-md shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
+        <div className="flex-1 min-h-0 relative rounded-lg flex items-center justify-center lg:min-h-[300px]">
+          <div className="relative inline-flex items-center justify-center max-w-full max-h-full lg:max-h-[85vh]">
+            <img src={currentUrl} className="max-w-full max-h-full lg:max-h-[85vh] object-contain rounded-md shadow-2xl" alt="" />
             {(['top-0 left-0 border-t-2 border-l-2 rounded-tl-md','top-0 right-0 border-t-2 border-r-2 rounded-tr-md','bottom-0 left-0 border-b-2 border-l-2 rounded-bl-md','bottom-0 right-0 border-b-2 border-r-2 rounded-br-md'] as const).map((cls, ci) => (
               <div key={ci} className={`absolute w-6 h-6 pointer-events-none ${cls} -translate-x-0.5 -translate-y-0.5 scale-105`} style={{ borderColor: accent }} />
             ))}
