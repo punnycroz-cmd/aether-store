@@ -402,7 +402,7 @@ function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, 
         style={{ maxHeight: '90vh' }}>
 
         <div className="flex-1 relative rounded-lg overflow-hidden flex items-center justify-center" style={{ minHeight: 300, maxHeight: '85vh' }}>
-          <img src={currentUrl} className="w-full h-full object-contain" alt="" />
+          <img src={currentUrl} className="max-w-full object-contain" style={{ maxHeight: '85vh' }} alt="" />
           {(['top-3 left-3 border-t-2 border-l-2','top-3 right-3 border-t-2 border-r-2','bottom-3 left-3 border-b-2 border-l-2','bottom-3 right-3 border-b-2 border-r-2'] as const).map((cls, ci) => (
             <div key={ci} className={`absolute w-6 h-6 pointer-events-none ${cls}`} style={{ borderColor: accent }} />
           ))}
