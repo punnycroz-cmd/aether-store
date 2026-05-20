@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SiteNav } from '../components/SiteNav';
 import { useAuth } from '../hooks/useAuth';
+import { MasonryGrid } from '../components/MasonryGrid';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { apiFetch } from '../lib/api';
 import { proxyImg } from '../lib/utils';
@@ -224,7 +225,7 @@ export function VaultPage() {
               </motion.div>
 
               {/* Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-start">
+              <MasonryGrid>
                 <AnimatePresence>
                   {visible.map((entry, i) => {
                     const col = entry.realm === 'day' ? dayAccent : starAccent;
@@ -238,7 +239,7 @@ export function VaultPage() {
                         animate={{ opacity: entry.is_hidden ? 0.35 : 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.88 }}
                         transition={{ duration: 0.5, delay: i * 0.04 }}
-                        className="break-inside-avoid relative rounded-2xl overflow-hidden cursor-pointer group"
+                        className="w-full mb-5 relative rounded-2xl overflow-hidden cursor-pointer group"
                         style={{ border: `1px solid ${col}28` }}
                         onClick={() => setLightboxEntry({ entry, imgIdx: 0 })}
                         whileHover={!entry.is_hidden ? { scale: 1.02, boxShadow: `0 0 36px ${col}28` } : {}}>

@@ -321,15 +321,20 @@ export function DiscoverPage() {
                 <p style={{ fontFamily: 'Cinzel, serif', fontSize: '1.2rem', letterSpacing: '0.2em' }}>The Void Awaits</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-start">
-                {filteredFeed.map((item, i) => (
-                  <motion.div key={item.request_id} className="break-inside-avoid"
-                    initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                    transition={{ delay: (i % 8) * 0.05 }}>
-                    <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
-                  </motion.div>
-                ))}
-              </div>
+              <MasonryGrid>
+  {filteredFeed.map((item, i) => (
+    <motion.div
+      key={item.request_id}
+      className="w-full mb-5"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: (i % 8) * 0.05 }}
+    >
+      <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
+    </motion.div>
+  ))}
+</MasonryGrid>
             )}
 
             <div ref={loaderRef} className="h-20 flex items-center justify-center">
