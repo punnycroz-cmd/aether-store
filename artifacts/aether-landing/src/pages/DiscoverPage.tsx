@@ -320,9 +320,9 @@ export function DiscoverPage() {
                 <p style={{ fontFamily: 'Cinzel, serif', fontSize: '1.2rem', letterSpacing: '0.2em' }}>The Void Awaits</p>
               </div>
             ) : (
-              <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-start">
                 {filteredFeed.map((item, i) => (
-                  <motion.div key={item.request_id} className="break-inside-avoid mb-5"
+                  <motion.div key={item.request_id} className="break-inside-avoid"
                     initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                     transition={{ delay: (i % 8) * 0.05 }}>
                     <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
