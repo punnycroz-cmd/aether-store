@@ -1,56 +1,48 @@
-// MasonryGrid component using CSS Grid and ResizeObserver for dynamic row spans
-import React, { useEffect, useRef, useState } from 'react';
+// MasonryGrid – CSS multi-column masonry layout
+// Uses CSS column-count for a simple, gap-free Pinterest-style layout.
+import React from 'react';
 
 interface MasonryGridProps {
   children: React.ReactNode;
-  breakpointCols: { [key: number]: number };
+  /** Number of columns at each breakpoint (defaults provided) */
+  columns?: { sm?: number; md?: number; lg?: number; xl?: number };
+  /** Gap between items in px */
+  gap?: number;
   className?: string;
 }
 
-export function MasonryGrid({ children, breakpointCols, className }: MasonryGridProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [spans, setSpans] = useState<Record<string, number>>({});
-  const rowHeight = 10; // tiny row height for span calculation
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const items = Array.from(container.children) as HTMLElement[];
-    const ro = new ResizeObserver(() => {
-      const newSpans: Record<string, number> = {};
-      items.forEach((item) => {
-        const key = item.getAttribute('data-masonry-key');
-        if (!key) return;
-        const height = item.getBoundingClientRect().height;
-        const span = Math.ceil(height / rowHeight);
-        newSpans[key] = span;
-      });
-      setSpans(newSpans);
-    });
-    items.forEach((item) => ro.observe(item));
-    return () => ro.disconnect();
-  }, [children]);
-
-  // Build responsive grid-template-columns via Tailwind classes passed in className
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gap: '1rem',
-    gridAutoRows: `${rowHeight}px`,
-  };
-
-  const cloned = React.Children.map(children, (child: any) => {
-    if (!React.isValidElement(child)) return child;
-    const key = child.key?.toString() ?? Math.random().toString();
-    const span = spans[key] ?? 1;
-    return React.cloneElement(child, {
-      'data-masonry-key': key,
-      style: { ...child.props.style, gridRowEnd: `span ${span}` },
-    });
-  });
+export function MasonryGrid({
+  children,
+  columns = { sm: 1, md: 2, lg: 3, xl: 4 },
+  gap = 20,
+  className = '',
+}: MasonryGridProps) {
+  const { sm = 1, md = 2, lg = 3, xl = 4 } = columns;
 
   return (
-    <div ref={containerRef} className={className} style={gridStyle}>
-      {cloned}
-    </div>
+    <>
+      <style>{`
+        .masonry-grid {
+          column-count: ${sm};
+          column-gap: ${gap}px;
+        }
+        @media (min-width: 640px) {
+          .masonry-grid { column-count: ${md}; }
+        }
+        @media (min-width: 1024px) {
+          .masonry-grid { column-count: ${lg}; }
+        }
+        @media (min-width: 1280px) {
+          .masonry-grid { column-count: ${xl}; }
+        }
+        .masonry-grid > * {
+          break-inside: avoid;
+          margin-bottom: ${gap}px;
+        }
+      `}</style>
+      <div className={`masonry-grid ${className}`}>
+        {children}
+      </div>
+    </>
   );
 }

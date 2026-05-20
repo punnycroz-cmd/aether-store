@@ -322,19 +322,19 @@ export function DiscoverPage() {
               </div>
             ) : (
               <MasonryGrid>
-  {filteredFeed.map((item, i) => (
-    <motion.div
-      key={item.request_id}
-      className="w-full mb-5"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: (i % 8) * 0.05 }}
-    >
-      <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
-    </motion.div>
-  ))}
-</MasonryGrid>
+                {filteredFeed.map((item, i) => (
+                  <motion.div
+                    key={item.request_id}
+                    className="break-inside-avoid"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: (i % 8) * 0.05 }}
+                  >
+                    <PromptCard item={item} baseLikes={item.likes_count ?? 0} />
+                  </motion.div>
+                ))}
+              </MasonryGrid>
             )}
 
             <div ref={loaderRef} className="h-20 flex items-center justify-center">

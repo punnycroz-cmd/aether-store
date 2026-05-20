@@ -239,12 +239,12 @@ export function VaultPage() {
                         animate={{ opacity: entry.is_hidden ? 0.35 : 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.88 }}
                         transition={{ duration: 0.5, delay: i * 0.04 }}
-                        className="w-full mb-5 relative rounded-2xl overflow-hidden cursor-pointer group"
+                        className="break-inside-avoid w-full relative rounded-2xl overflow-hidden cursor-pointer group"
                         style={{ border: `1px solid ${col}28` }}
                         onClick={() => setLightboxEntry({ entry, imgIdx: 0 })}
                         whileHover={!entry.is_hidden ? { scale: 1.02, boxShadow: `0 0 36px ${col}28` } : {}}>
 
-                        <img src={thumb} className="w-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
+                        <img src={thumb} className="w-full h-auto block transition-transform duration-700 group-hover:scale-105" alt="" />
                         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(5,8,20,0.85) 0%, transparent 50%)' }} />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-250"
                           style={{ background: `linear-gradient(160deg,${col}0a,rgba(0,0,0,0.4))` }} />
