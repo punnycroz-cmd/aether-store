@@ -179,15 +179,15 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
       <motion.div
         ref={cardRef}
         onClick={onClick}
-        className="group relative rounded-2xl overflow-hidden cursor-pointer"
+        className="group relative rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full"
         style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
         whileHover={{ borderColor: `${accent}44`, y: -2 }}
         transition={{ duration: 0.2 }}>
 
         {/* Image area */}
-        <div className="relative overflow-hidden aspect-square bg-black/40">
+        <div className="relative overflow-hidden bg-black/40">
           {thumb ? (
-            <img src={thumb} alt="" crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={thumb} alt="" crossOrigin="anonymous" className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
@@ -231,7 +231,7 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
         </div>
 
         {/* Card body */}
-        <div className="p-3">
+        <div className="p-3 flex-1 flex flex-col justify-between">
           {/* Mobile-Only Action Row */}
           <div className="flex md:hidden items-center justify-between gap-2 mb-3 pb-3 border-b border-white/5">
              <button onClick={remix} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[0.6rem] font-bold uppercase tracking-widest"

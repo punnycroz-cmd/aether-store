@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { SiteNav } from '../components/SiteNav';
 import { PromptCard } from '../components/PromptCard';
+import { MasonryGrid } from '../components/MasonryGrid';
 import { apiFetch, social } from '../lib/api';
 import { extractTags, getThumb } from '../lib/utils';
 import { useAuth } from '../hooks/useAuth';
