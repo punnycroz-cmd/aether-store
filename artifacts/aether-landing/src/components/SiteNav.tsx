@@ -79,14 +79,13 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
         </Link>
 
         {/* --- DESKTOP/TABLET TABS --- */}
-        <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg"
+        <div className="hidden sm:flex items-center gap-0.5 md:gap-1 p-0.5 md:p-1 rounded-lg"
           style={{ background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', border: dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)' }}>
           {TABS.map(tab => {
             const active = location === tab.path;
-            const isSecondary = tab.label === 'Store' || tab.label === 'Challenges' || tab.label.includes('Cage');
             return (
-              <Link key={tab.path} href={tab.path} className={isSecondary ? 'hidden lg:block' : 'block'}>
-                <motion.div className="relative px-3 md:px-5 py-2 rounded-lg cursor-pointer group"
+              <Link key={tab.path} href={tab.path} className="block">
+                <motion.div className="relative px-2 md:px-4 py-1.5 md:py-2 rounded-lg cursor-pointer group"
                   style={{ background: active ? `${tab.accent}12` : 'transparent' }}
                   whileHover={{ background: `${tab.accent}08` }}>
                   <div className="flex items-center gap-2">
@@ -106,18 +105,8 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
             );
           })}
           
-          {/* Tablet 'More' Menu for secondary tabs */}
-          <div className="lg:hidden block relative">
-             <motion.button onClick={() => setDropOpen(!dropOpen)}
-               className="px-3 py-2 rounded-lg text-[0.62rem] font-bold uppercase tracking-widest"
-               style={{ fontFamily: 'Outfit, sans-serif', color: textBase, background: 'transparent' }}
-               whileHover={{ background: 'rgba(255,255,255,0.05)' }}>
-               More
-             </motion.button>
-          </div>
-          
           <Link href="/forge">
-            <motion.div className="px-4 md:px-6 py-2 rounded-lg cursor-pointer ml-1"
+            <motion.div className="px-2.5 md:px-5 py-1.5 md:py-2 rounded-lg cursor-pointer ml-0.5"
               style={{ 
                 background: location === '/forge' ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.05)',
                 border: `1px solid ${location === '/forge' ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.15)'}`
