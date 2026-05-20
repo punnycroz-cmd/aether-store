@@ -8,12 +8,12 @@ import { NotificationsPanel } from './NotificationsPanel';
 const mascotImg = `${import.meta.env.BASE_URL}assets/mascot.png`;
 
 const NAV_ITEMS = [
-  { label: 'Discover',   path: '/discover',   accent: '#8b5cf6', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
-  { label: 'Store',      path: '/store',      accent: '#f6c043', icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' },
-  { label: 'Challenges', path: '/challenges', accent: '#f472b6', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z' },
+  { label: 'Discover',   path: '/discover',   accent: '#8b5cf6', icon: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M2 12h20 M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z' },
+  { label: 'Store',      path: '/store',      accent: '#f6c043', icon: 'M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z M20 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6' },
+  { label: 'Challenges', path: '/challenges', accent: '#f472b6', icon: 'M6 9H4.5a2.5 2.5 0 0 1 0-5H6 M18 9h1.5a2.5 2.5 0 0 0 0-5H18 M4 22h16 M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34 M8 2h8v7a4 4 0 0 1-8 0V2z' },
   { label: 'Cage',       path: '/cage',       accent: '#ef4444', icon: 'M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z M7 11V7a5 5 0 0110 0v4' },
-  { label: 'The Forge',  path: '/forge',      accent: '#10b981', icon: 'M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83' },
-  { label: 'Vault',      path: '/vault',      accent: '#f6e3ba', icon: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z' },
+  { label: 'The Forge',  path: '/forge',      accent: '#10b981', icon: 'M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z' },
+  { label: 'Vault',      path: '/vault',      accent: '#f6e3ba', icon: 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z' },
 ];
 
 export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
@@ -207,11 +207,11 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
 
                         <div className="p-1.5">
                           {[
-                            { label: 'Store', icon: 'M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z', path: '/store' },
-                            { label: 'Challenges', icon: 'M12 15l-2 5h4l-2-5zm0 0l2-5h-4l2 5zm0 0l5 2-5-2zm0 0l-5 2 5-2z', path: '/challenges' },
-                            { label: 'The Cage', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', path: '/cage' },
-                            { label: 'My Vault', icon: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z', path: '/vault' },
-                            { label: 'The Forge', icon: 'M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83', path: '/forge' },
+                            { label: 'Store', icon: 'M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z M20 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2z M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6', path: '/store' },
+                            { label: 'Challenges', icon: 'M6 9H4.5a2.5 2.5 0 0 1 0-5H6 M18 9h1.5a2.5 2.5 0 0 0 0-5H18 M4 22h16 M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34 M8 2h8v7a4 4 0 0 1-8 0V2z', path: '/challenges' },
+                            { label: 'The Cage', icon: 'M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z M7 11V7a5 5 0 0110 0v4', path: '/cage' },
+                            { label: 'My Vault', icon: 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z', path: '/vault' },
+                            { label: 'The Forge', icon: 'M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z', path: '/forge' },
                           ].map(item => (
                             <button key={item.path} onClick={() => { setDropOpen(false); navigate(item.path); }}
                               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors text-left">
