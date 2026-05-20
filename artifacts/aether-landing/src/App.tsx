@@ -1,4 +1,5 @@
 import { Router, Route, Switch } from 'wouter';
+import { Toaster } from 'sonner';
 import { LandingPage }        from './pages/LandingPage';
 import { ForgePage }          from './pages/ForgePage';
 import { VaultPage }          from './pages/VaultPage';
@@ -13,19 +14,31 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 export default function App() {
   return (
-    <Router base={base}>
-      <Switch>
-        <Route path="/forge"               component={ForgePage}           />
-        <Route path="/vault"               component={VaultPage}           />
-        <Route path="/discover"            component={DiscoverPage}        />
-        <Route path="/feed"                component={DiscoverPage}        />
-        <Route path="/store"               component={StorePage}           />
-        <Route path="/profile"             component={ProfilePage}         />
-        <Route path="/profile/:username"   component={CreatorProfilePage}  />
-        <Route path="/challenges"          component={ChallengesPage}      />
-        <Route path="/cage"                component={PromptCagePage}      />
-        <Route                             component={LandingPage}         />
-      </Switch>
-    </Router>
+    <>
+      <Toaster
+        theme="dark"
+        position="bottom-right"
+        richColors
+        toastOptions={{
+          className: 'backdrop-blur-xl !bg-neutral-950/90 !border-white/10 !text-white !shadow-2xl',
+          style: { fontFamily: 'Outfit, sans-serif' },
+        }}
+      />
+      <Router base={base}>
+        <Switch>
+          <Route path="/forge"               component={ForgePage}           />
+          <Route path="/vault"               component={VaultPage}           />
+          <Route path="/discover"            component={DiscoverPage}        />
+          <Route path="/feed"                component={DiscoverPage}        />
+          <Route path="/store"               component={StorePage}           />
+          <Route path="/profile"             component={ProfilePage}         />
+          <Route path="/profile/:username"   component={CreatorProfilePage}  />
+          <Route path="/challenges"          component={ChallengesPage}      />
+          <Route path="/cage"                component={PromptCagePage}      />
+          <Route                             component={LandingPage}         />
+        </Switch>
+      </Router>
+    </>
   );
 }
+

@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { SiteNav } from '../components/SiteNav';
 import { useAuth } from '../hooks/useAuth';
 import { MasonryGrid } from '../components/MasonryGrid';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { apiFetch } from '../lib/api';
 import { proxyImg } from '../lib/utils';
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '../components/ui/alert-dialog';
 
 type Realm = 'all' | 'day' | 'star';
 
@@ -52,6 +57,7 @@ export function VaultPage() {
   const [cursor, setCursor]       = useState<number | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [lightboxEntry, setLightboxEntry] = useState<{ entry: VaultEntry; imgIdx: number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const dayAccent  = '#10b981';
   const starAccent = '#8b5cf6';
@@ -88,43 +94,57 @@ export function VaultPage() {
     loadMore(true);
   }, [user, filter, showHidden]);
 
+  // ── Improvement #1 & #2: Archive with toast ──
   async function hideBatch(requestId: string) {
     await apiFetch(`/history/batch/${requestId}/hide`, { method: 'POST' }).catch(() => {});
     setEntries(prev => prev.map(e => e.request_id === requestId ? { ...e, is_hidden: true } : e));
     if (lightboxEntry?.entry.request_id === requestId) setLightboxEntry(null);
+    toast.success('Vision archived to the sealed vault');
   }
 
   async function showBatch(requestId: string) {
     await apiFetch(`/history/batch/${requestId}/show`, { method: 'POST' }).catch(() => {});
     setEntries(prev => prev.map(e => e.request_id === requestId ? { ...e, is_hidden: false } : e));
+    toast.success('Vision restored to the main grid');
   }
 
-  async function deleteBatch(requestId: string) {
-    if (!confirm('Permanently banish this vision? This cannot be undone.')) return;
+  // ── Improvement #4: Glassmorphic delete (no more confirm()) ──
+  async function confirmDeleteBatch() {
+    if (!deleteTarget) return;
+    const requestId = deleteTarget;
+    setDeleteTarget(null);
     await apiFetch(`/history/batch/${requestId}`, { method: 'DELETE' }).catch(() => {});
     setEntries(prev => prev.filter(e => e.request_id !== requestId));
     if (lightboxEntry?.entry.request_id === requestId) setLightboxEntry(null);
+    toast.success('Vision dissolved into the void');
   }
 
+  // ── Improvement #2: Optimistic share toggle with toast ──
   async function togglePublic(entry: VaultEntry) {
     if (isSharing) return;
     setIsSharing(true);
+
+    const nextIsPublic = !entry.is_public;
+
+    // Optimistic update
+    setEntries(prev => prev.map(e => e.request_id === entry.request_id ? { ...e, is_public: nextIsPublic } : e));
+    if (lightboxEntry?.entry.request_id === entry.request_id) {
+      setLightboxEntry(prev => prev ? { ...prev, entry: { ...prev.entry, is_public: nextIsPublic } } : null);
+    }
+    toast.success(nextIsPublic ? 'Vision cast onto the Discovery Stream' : 'Vision withdrawn to private vault');
+
     try {
       await apiFetch(`/history/batch/${entry.request_id}/public`, {
         method: 'POST',
-        body: JSON.stringify({ is_public: !entry.is_public }),
+        body: JSON.stringify({ is_public: nextIsPublic }),
       });
-      
-      const nextIsPublic = !entry.is_public;
-      
-      // Update gallery list
-      setEntries(prev => prev.map(e => e.request_id === entry.request_id ? { ...e, is_public: nextIsPublic } : e));
-      
-      // Sync lightbox state
-      if (lightboxEntry?.entry.request_id === entry.request_id) {
-        setLightboxEntry(prev => prev ? { ...prev, entry: { ...prev.entry, is_public: nextIsPublic } } : null);
-      }
     } catch (e) {
+      // Rollback
+      setEntries(prev => prev.map(e2 => e2.request_id === entry.request_id ? { ...e2, is_public: !nextIsPublic } : e2));
+      if (lightboxEntry?.entry.request_id === entry.request_id) {
+        setLightboxEntry(prev => prev ? { ...prev, entry: { ...prev.entry, is_public: !nextIsPublic } } : null);
+      }
+      toast.error('The Aether network rejected the manifestation. Please try again.');
       console.error('Failed to toggle public:', e);
     } finally {
       setIsSharing(false);
@@ -234,11 +254,11 @@ export function VaultPage() {
                     return (
                       <motion.div key={entry.request_id}
                         initial={{ opacity: 0, scale: 0.92 }}
-                        animate={{ opacity: entry.is_hidden ? 0.35 : 1, scale: 1 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: i * 0.04 }}
                         className="break-inside-avoid w-full relative rounded-2xl overflow-hidden cursor-pointer group"
                         style={{ border: `1px solid ${col}28` }}
-                        onClick={() => setLightboxEntry({ entry, imgIdx: 0 })}
+                        onClick={() => !entry.is_hidden && setLightboxEntry({ entry, imgIdx: 0 })}
                         whileHover={!entry.is_hidden ? { scale: 1.02, boxShadow: `0 0 36px ${col}28` } : {}}>
 
                         <img src={thumb} className="w-full h-auto block transition-transform duration-700 group-hover:scale-105" alt="" />
@@ -246,6 +266,23 @@ export function VaultPage() {
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-250"
                           style={{ background: `linear-gradient(160deg,${col}0a,rgba(0,0,0,0.4))` }} />
 
+                        {/* ── Improvement #1: Archived Shield Overlay ── */}
+                        {entry.is_hidden && (
+                          <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-4">
+                            <span className="text-xs tracking-widest uppercase font-semibold px-3 py-1 rounded-full border shadow-lg backdrop-blur-md"
+                              style={{ fontFamily: 'Cinzel, serif', color: 'rgba(246,196,67,0.8)', background: 'rgba(120,80,20,0.25)', borderColor: 'rgba(246,196,67,0.2)' }}>
+                              Archived Seal
+                            </span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); showBatch(entry.request_id); }}
+                              className="mt-3 text-[11px] underline transition-colors hover:text-white"
+                              style={{ fontFamily: 'Outfit, sans-serif', color: 'rgba(255,255,255,0.4)' }}>
+                              Restore to Main Grid
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Realm badge */}
                         <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full"
                           style={{ background: `${col}22`, border: `1px solid ${col}44` }}>
                           <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.52rem', color: col, textTransform: 'uppercase', letterSpacing: '0.18em' }}>
@@ -253,12 +290,6 @@ export function VaultPage() {
                           </span>
                         </div>
 
-                        {entry.is_hidden && (
-                          <div className="absolute top-3 right-14 px-2 py-1 rounded-full"
-                            style={{ background: 'rgba(246,196,67,0.12)', border: '1px solid rgba(246,196,67,0.25)' }}>
-                            <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.52rem', color: 'rgba(246,196,67,0.6)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>Archived</span>
-                          </div>
-                        )}
                         {entry.is_public && !entry.is_hidden && (
                           <div className="absolute top-3 right-14 px-2 py-1 rounded-full"
                             style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
@@ -266,33 +297,28 @@ export function VaultPage() {
                           </div>
                         )}
 
-                        {/* Action buttons */}
-                        <div className="absolute top-3 right-3 flex gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-                          {entry.is_hidden ? (
-                            <button onClick={(e) => { e.stopPropagation(); showBatch(entry.request_id); }}
-                              className="w-9 h-9 rounded-full flex items-center justify-center"
-                              style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.25)' }}
-                              title="Unarchive">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            </button>
-                          ) : (
+                        {/* Action buttons (only when not hidden) */}
+                        {!entry.is_hidden && (
+                          <div className="absolute top-3 right-3 flex gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                             <button onClick={(e) => { e.stopPropagation(); hideBatch(entry.request_id); }}
                               className="w-9 h-9 rounded-full flex items-center justify-center"
                               style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.25)' }}
                               title="Archive">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                             </button>
-                          )}
-                        </div>
+                          </div>
+                        )}
 
-                        {/* Multi-image strip */}
-                        {visImgs.length > 1 && (
-                          <div className="absolute bottom-12 left-3 flex gap-1">
+                        {/* ── Improvement #3: Multi-image strip with isolated hitbox ── */}
+                        {visImgs.length > 1 && !entry.is_hidden && (
+                          <div className="absolute bottom-12 left-3 flex gap-2 z-30">
                             {visImgs.slice(1, 4).map((img, ii) => (
-                              <div key={ii} className="w-8 h-8 rounded-lg overflow-hidden border border-white/10"
-                                onClick={(e) => { e.stopPropagation(); setLightboxEntry({ entry, imgIdx: ii + 1 }); }}>
+                              <button key={ii}
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLightboxEntry({ entry, imgIdx: ii + 1 }); }}
+                                className="relative w-10 h-10 rounded-lg overflow-hidden border transition-all duration-200 hover:scale-105 active:scale-95 hover:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500 p-0"
+                                style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
                                 <img src={proxyImg(img.r2_url ?? img.url) ?? undefined} className="w-full h-full object-cover" alt="" />
-                              </div>
+                              </button>
                             ))}
                           </div>
                         )}
@@ -340,7 +366,7 @@ export function VaultPage() {
         </div>
       </div>
 
-      {/* Vault Lightbox */}
+      {/* Vault Lightbox – Improvement #6 & #7 */}
       <AnimatePresence>
         {lightboxEntry && (
           <VaultLightbox
@@ -349,41 +375,113 @@ export function VaultPage() {
             showHidden={showHidden}
             onClose={() => setLightboxEntry(null)}
             onHide={() => hideBatch(lightboxEntry.entry.request_id)}
-            onDelete={() => deleteBatch(lightboxEntry.entry.request_id)}
+            onSetDeleteTarget={() => setDeleteTarget(lightboxEntry.entry.request_id)}
             onTogglePublic={() => togglePublic(lightboxEntry.entry)}
             isSharing={isSharing}
             onImgChange={(idx) => setLightboxEntry(prev => prev ? { ...prev, imgIdx: idx } : null)}
+            visibleEntries={visible}
+            onNavigateEntry={(e, idx) => setLightboxEntry({ entry: e, imgIdx: idx })}
           />
         )}
       </AnimatePresence>
+
+      {/* ── Improvement #4: Glassmorphic Delete Confirmation Dialog ── */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent className="bg-neutral-950/80 backdrop-blur-xl border border-white/10 rounded-2xl max-w-md shadow-2xl shadow-black/80">
+          <AlertDialogHeader>
+            <AlertDialogTitle style={{ fontFamily: 'Cinzel, serif', letterSpacing: '0.08em' }} className="text-xl text-white">
+              Banish Vision to Void?
+            </AlertDialogTitle>
+            <AlertDialogDescription style={{ fontFamily: 'Outfit, sans-serif' }} className="text-neutral-400 text-sm leading-relaxed">
+              This operation permanently dissolves the manifestation. The composition cannot be restored once forgotten.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 gap-2">
+            <AlertDialogCancel className="bg-transparent border border-white/10 text-neutral-300 hover:bg-white/5 hover:text-white rounded-xl">
+              Maintain Echo
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteBatch}
+              className="bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-200 rounded-xl shadow-lg shadow-red-950/20"
+            >
+              Banish Manifestation
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
 
-function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, onDelete, onTogglePublic, onImgChange }: {
+/* ═══════════════════════════════════════════════════════════════
+   VaultLightbox — Improvements #5, #6, #7 applied
+   ═══════════════════════════════════════════════════════════════ */
+function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, onSetDeleteTarget, onTogglePublic, onImgChange, visibleEntries, onNavigateEntry }: {
   entry: VaultEntry;
   imgIdx: number;
   showHidden: boolean;
   isSharing: boolean;
   onClose: () => void;
   onHide: () => void;
-  onDelete: () => void;
+  onSetDeleteTarget: () => void;
   onTogglePublic: () => void;
   onImgChange: (i: number) => void;
+  visibleEntries: VaultEntry[];
+  onNavigateEntry: (entry: VaultEntry, imgIdx: number) => void;
 }) {
   const accent = entry.realm === 'day' ? '#10b981' : '#8b5cf6';
   const visImgs = entry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
   const currentUrl = proxyImg(visImgs[imgIdx]?.r2_url ?? visImgs[imgIdx]?.url ?? null);
 
+  const feedIdx = visibleEntries.findIndex(ve => ve.request_id === entry.request_id);
+  const isFirstInFeed = feedIdx <= 0 && imgIdx === 0;
+  const isLastInFeed = feedIdx >= visibleEntries.length - 1 && imgIdx >= visImgs.length - 1;
+
+  // ── Improvement #6: Feed-aware keyboard navigation ──
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft' && imgIdx > 0) onImgChange(imgIdx - 1);
-      if (e.key === 'ArrowRight' && imgIdx < visImgs.length - 1) onImgChange(imgIdx + 1);
+      if (e.key === 'ArrowRight') {
+        if (imgIdx < visImgs.length - 1) {
+          onImgChange(imgIdx + 1);
+        } else if (feedIdx >= 0 && feedIdx < visibleEntries.length - 1) {
+          onNavigateEntry(visibleEntries[feedIdx + 1], 0);
+        }
+      }
+      if (e.key === 'ArrowLeft') {
+        if (imgIdx > 0) {
+          onImgChange(imgIdx - 1);
+        } else if (feedIdx > 0) {
+          const prevEntry = visibleEntries[feedIdx - 1];
+          const prevImgs = prevEntry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
+          onNavigateEntry(prevEntry, Math.max(0, prevImgs.length - 1));
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [imgIdx, visImgs.length, onClose, onImgChange]);
+  }, [imgIdx, visImgs.length, onClose, onImgChange, feedIdx, visibleEntries, onNavigateEntry, showHidden]);
+
+  // ── Improvement #5: Blob download engine ──
+  async function triggerDownload() {
+    if (!currentUrl) return;
+    try {
+      toast.info('Extracting vision blueprint...');
+      const response = await fetch(currentUrl);
+      const blob = await response.blob();
+      const localBlobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = localBlobUrl;
+      a.download = `Aether_${entry.request_id}_${imgIdx}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(localBlobUrl);
+      toast.success('Vision blueprint extracted');
+    } catch {
+      toast.error('Download blocked by cross-origin security walls.');
+    }
+  }
 
   if (!currentUrl) return null;
 
@@ -392,52 +490,91 @@ function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, 
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onClick={onClose}>
-      <motion.div className="relative w-full max-w-5xl flex flex-col lg:flex-row lg:items-start gap-4 h-[90vh] lg:h-auto"
+      <motion.div className="relative w-full max-w-6xl flex flex-col lg:flex-row gap-4"
         initial={{ scale: 0.9, y: 32 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.88, opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{ maxHeight: '90vh' }}>
 
-        <div className="flex-1 min-h-0 relative rounded-lg flex items-center justify-center lg:min-h-[300px]">
-          <img src={currentUrl} className="max-w-full max-h-full lg:max-h-[85vh] object-contain rounded-md shadow-2xl p-2" alt="" />
-          {(['top-0 left-0 border-t-2 border-l-2 rounded-tl-lg','top-0 right-0 border-t-2 border-r-2 rounded-tr-lg','bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg','bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg'] as const).map((cls, ci) => (
-            <div key={ci} className={`absolute w-6 h-6 pointer-events-none ${cls}`} style={{ borderColor: accent }} />
-          ))}
-          {imgIdx > 0 && (
-            <button className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.14)' }}
-              onClick={() => onImgChange(imgIdx - 1)}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-          )}
-          {imgIdx < visImgs.length - 1 && (
-            <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.14)' }}
-              onClick={() => onImgChange(imgIdx + 1)}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-          )}
-          {visImgs.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {visImgs.map((_, i) => (
-                <button key={i} onClick={() => onImgChange(i)} className="rounded-full transition-all"
-                  style={{ width: i === imgIdx ? 20 : 6, height: 6, background: i === imgIdx ? accent : 'rgba(255,255,255,0.3)' }} />
-              ))}
+        {/* ── Improvement #7: Left Panel — Image + Prompt Tray ── */}
+        <div className="flex-1 flex flex-col min-h-0 gap-3">
+          {/* Image viewport */}
+          <div className="flex-1 min-h-0 relative rounded-lg flex items-center justify-center">
+            <img src={currentUrl} className="max-w-full max-h-[70vh] lg:max-h-[72vh] object-contain rounded-md shadow-2xl" alt="" />
+
+            {/* Corner ornaments */}
+            {(['top-0 left-0 border-t-2 border-l-2 rounded-tl-lg','top-0 right-0 border-t-2 border-r-2 rounded-tr-lg','bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg','bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg'] as const).map((cls, ci) => (
+              <div key={ci} className={`absolute w-6 h-6 pointer-events-none ${cls}`} style={{ borderColor: accent }} />
+            ))}
+
+            {/* Left arrow (feed-aware) */}
+            {!isFirstInFeed && (
+              <button className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.14)' }}
+                onClick={() => {
+                  if (imgIdx > 0) { onImgChange(imgIdx - 1); }
+                  else if (feedIdx > 0) {
+                    const prevEntry = visibleEntries[feedIdx - 1];
+                    const prevImgs = prevEntry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
+                    onNavigateEntry(prevEntry, Math.max(0, prevImgs.length - 1));
+                  }
+                }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+            )}
+
+            {/* Right arrow (feed-aware) */}
+            {!isLastInFeed && (
+              <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.14)' }}
+                onClick={() => {
+                  if (imgIdx < visImgs.length - 1) { onImgChange(imgIdx + 1); }
+                  else if (feedIdx < visibleEntries.length - 1) {
+                    onNavigateEntry(visibleEntries[feedIdx + 1], 0);
+                  }
+                }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            )}
+
+            {/* Variant dots */}
+            {visImgs.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {visImgs.map((_, i) => (
+                  <button key={i} onClick={() => onImgChange(i)} className="rounded-full transition-all"
+                    style={{ width: i === imgIdx ? 20 : 6, height: 6, background: i === imgIdx ? accent : 'rgba(255,255,255,0.3)' }} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Prompt Tray (wide, below image) */}
+          {entry.prompt && (
+            <div className="rounded-2xl p-5 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+              <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(139,92,246,0.7)', textTransform: 'uppercase', letterSpacing: '0.22em', marginBottom: 8, fontWeight: 600 }}>
+                The Incantation Blueprint
+              </p>
+              <p className="pr-2" style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.8rem', color: 'rgba(248,250,252,0.6)', lineHeight: 1.7, fontStyle: 'italic', maxHeight: '6rem', overflowY: 'auto' }}>
+                "{entry.prompt}"
+              </p>
             </div>
           )}
         </div>
 
-        <div className="lg:w-64 flex-shrink-0 flex flex-col gap-3" style={{ maxHeight: '85vh' }}>
+        {/* ── Improvement #7: Right Sidebar — Metadata + Actions ── */}
+        <div className="lg:w-72 flex-shrink-0 flex flex-col gap-3" style={{ maxHeight: '90vh' }}>
+          {/* Close */}
           <div className="flex justify-end">
-            <button className="w-9 h-9 rounded-full flex items-center justify-center"
+            <button className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
               style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
               onClick={onClose}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
 
-          <div className="flex-1 rounded-lg p-5 overflow-y-auto"
-            style={{ background: 'rgba(8,12,24,0.96)', border: `1px solid ${accent}28` }}>
+          {/* Metadata Panel (structured data only — prompt moved to tray) */}
+          <div className="flex-1 rounded-2xl p-5 overflow-y-auto" style={{ background: 'rgba(8,12,24,0.96)', border: `1px solid ${accent}28`, boxShadow: `0 0 32px ${accent}18` }}>
+            {/* Realm badge */}
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full mb-4"
               style={{ background: `${accent}18`, border: `1px solid ${accent}40` }}>
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
@@ -456,31 +593,58 @@ function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, 
               </p>
             )}
 
-            {entry.prompt && (
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(246,196,67,0.45)', textTransform: 'uppercase', letterSpacing: '0.22em', marginBottom: 6 }}>The Incantation</p>
-                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.75rem', color: 'rgba(248,250,252,0.52)', lineHeight: 1.7, fontStyle: 'italic' }}>"{entry.prompt}"</p>
+            {/* Manifestation Analytics */}
+            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(246,196,67,0.45)', textTransform: 'uppercase', letterSpacing: '0.22em', marginBottom: 10 }}>
+                Manifestation Analytics
+              </p>
+              <div className="flex flex-col gap-2.5">
+                {entry.aspect && (
+                  <div className="flex justify-between text-xs" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>Aether Aspect</span>
+                    <span style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace', fontSize: '0.7rem' }}>{entry.aspect}</span>
+                  </div>
+                )}
+                {entry.quality && (
+                  <div className="flex justify-between text-xs" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>Quality Tier</span>
+                    <span style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace', fontSize: '0.7rem' }}>{entry.quality}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-xs" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.35)' }}>Variants</span>
+                  <span style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace', fontSize: '0.7rem' }}>{visImgs.length}</span>
+                </div>
+                <div className="flex justify-between text-xs" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.35)' }}>Status</span>
+                  <span style={{ color: entry.is_public ? '#10b981' : 'rgba(255,255,255,0.5)', fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                    {entry.is_public ? 'Public' : 'Private'}
+                  </span>
+                </div>
               </div>
-            )}
+            </div>
 
-            {entry.aspect && (
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.55rem', color: 'rgba(246,196,67,0.45)', textTransform: 'uppercase', letterSpacing: '0.22em', marginBottom: 4 }}>Aspect · Quality</p>
-                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>{entry.aspect} · {entry.quality ?? 'Fast'}</p>
+            {/* Feed position indicator */}
+            {visibleEntries.length > 1 && (
+              <div className="mt-4 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.52rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textAlign: 'center' }}>
+                  {feedIdx + 1} / {visibleEntries.length} in grid · variant {imgIdx + 1} / {visImgs.length}
+                </p>
               </div>
             )}
           </div>
 
+          {/* Actions */}
           <div className="space-y-2 flex-shrink-0">
             <motion.button onClick={onTogglePublic} disabled={isSharing}
               className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 font-bold uppercase tracking-widest"
-              style={{ 
-                fontFamily: 'Outfit, sans-serif', 
-                fontSize: '0.62rem', 
-                background: isSharing ? 'rgba(255,255,255,0.02)' : (entry.is_public ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.04)'), 
-                border: `1px solid ${isSharing ? 'rgba(255,255,255,0.1)' : (entry.is_public ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.1)')}`, 
-                color: isSharing ? 'rgba(255,255,255,0.2)' : (entry.is_public ? '#10b981' : 'rgba(255,255,255,0.6)'), 
-                cursor: isSharing ? 'not-allowed' : 'pointer' 
+              style={{
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: '0.62rem',
+                background: isSharing ? 'rgba(255,255,255,0.02)' : (entry.is_public ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.04)'),
+                border: `1px solid ${isSharing ? 'rgba(255,255,255,0.1)' : (entry.is_public ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.1)')}`,
+                color: isSharing ? 'rgba(255,255,255,0.2)' : (entry.is_public ? '#10b981' : 'rgba(255,255,255,0.6)'),
+                cursor: isSharing ? 'not-allowed' : 'pointer'
               }}
               whileHover={!isSharing ? { scale: 1.02 } : {}} whileTap={!isSharing ? { scale: 0.97 } : {}}>
               {isSharing ? (
@@ -495,20 +659,24 @@ function VaultLightbox({ entry, imgIdx, showHidden, isSharing, onClose, onHide, 
                 </>
               )}
             </motion.button>
-            <a href={currentUrl} download target="_blank" rel="noreferrer"
-              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold uppercase tracking-widest"
-              style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', display: 'flex', cursor: 'pointer' }}>
+
+            {/* ── Improvement #5: Blob download button ── */}
+            <button onClick={triggerDownload}
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold uppercase tracking-widest transition-all hover:bg-white/[0.06]"
+              style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer' }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download Vision
-            </a>
+            </button>
+
             <button onClick={() => { onHide(); onClose(); }}
-              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-semibold uppercase tracking-widest"
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-semibold uppercase tracking-widest transition-all hover:bg-white/[0.06]"
               style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
               Archive Vision
             </button>
-            <button onClick={() => { onDelete(); }}
-              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-semibold uppercase tracking-widest"
+
+            <button onClick={() => { onSetDeleteTarget(); onClose(); }}
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 font-semibold uppercase tracking-widest transition-all hover:bg-red-950/30"
               style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.62rem', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.18)', color: 'rgba(248,113,113,0.55)', cursor: 'pointer' }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/></svg>
               Banish Forever
