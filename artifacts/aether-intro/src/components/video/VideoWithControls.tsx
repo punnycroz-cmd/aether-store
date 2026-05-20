@@ -132,6 +132,8 @@ function ControlBar({
 
 export default function VideoWithControls() {
   const isIframed = typeof window !== 'undefined' && window.self !== window.top;
+  const hasControlsParam = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('controls');
+  const renderControls = isIframed || hasControlsParam;
 
   const {
     sceneKeys,
@@ -187,7 +189,7 @@ export default function VideoWithControls() {
 
   const barVisible = !collapsed || hovering || tapPinned;
 
-  if (!isIframed) return <VideoTemplate />;
+  if (!renderControls) return <VideoTemplate />;
 
   return (
     <div className="relative w-full h-screen">
