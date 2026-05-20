@@ -185,7 +185,7 @@ export function PromptCard({ item, onClick, baseLikes = 0 }: PromptCardProps) {
         transition={{ duration: 0.2 }}>
 
         {/* Image area */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', background: 'rgba(0,0,0,0.4)' }}>
+        <div className="relative overflow-hidden aspect-square bg-black/40">
           {thumb ? (
             <img src={thumb} alt="" crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
           ) : (
