@@ -226,7 +226,6 @@ export function VaultPage() {
 
               {/* Grid */}
               <MasonryGrid>
-                <AnimatePresence>
                   {visible.map((entry, i) => {
                     const col = entry.realm === 'day' ? dayAccent : starAccent;
                     const visImgs = entry.images.filter(img => showHidden || (img.status !== 'hidden' && img.status !== 'deleting'));
@@ -234,10 +233,8 @@ export function VaultPage() {
                     if (!thumb) return null;
                     return (
                       <motion.div key={entry.request_id}
-                        layout
                         initial={{ opacity: 0, scale: 0.92 }}
                         animate={{ opacity: entry.is_hidden ? 0.35 : 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.88 }}
                         transition={{ duration: 0.5, delay: i * 0.04 }}
                         className="break-inside-avoid w-full relative rounded-2xl overflow-hidden cursor-pointer group"
                         style={{ border: `1px solid ${col}28` }}
@@ -311,10 +308,9 @@ export function VaultPage() {
                       </motion.div>
                     );
                   })}
-                </AnimatePresence>
 
                 {visible.length === 0 && !loading && (
-                  <div className="col-span-full text-center py-24">
+                  <div className="text-center py-24" style={{ gridColumn: '1 / -1' }}>
                     <p style={{ fontFamily: 'Cinzel, serif', fontSize: '1.2rem', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.15em' }}>The Grimoire is empty</p>
                     <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.1)', marginTop: 8, letterSpacing: '0.1em' }}>No visions match this realm filter</p>
                   </div>
