@@ -312,8 +312,9 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
       </AnimatePresence>
 
       {/* --- MOBILE FLOATING BOTTOM DOCK (Clean sm-only) --- */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] sm:hidden w-[90%] max-w-[340px]">
-         <div className="bg-[#0a1322]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-1.5 flex items-center justify-between shadow-2xl shadow-black/50">
+      {!mobileOpen && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] sm:hidden w-[90%] max-w-[340px]">
+           <div className="bg-[#0a1322]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-1.5 flex items-center justify-between shadow-2xl shadow-black/50">
             {[
               { label: 'Discover', path: '/discover', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
               { label: 'Forge', path: '/forge', icon: 'M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83' },
@@ -334,6 +335,7 @@ export function SiteNav({ activeSection = 0 }: { activeSection?: number }) {
             })}
          </div>
       </div>
+      )}
     </>
   );
 }
