@@ -319,7 +319,7 @@ export function VaultPage() {
                     <p style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.1)', marginTop: 8, letterSpacing: '0.1em' }}>No visions match this realm filter</p>
                   </div>
                 )}
-              </div>
+              </MasonryGrid>
 
               {/* Load more / loading */}
               {loading && (
